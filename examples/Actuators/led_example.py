@@ -14,6 +14,12 @@ board = Board()
 # Creating a new led object
 led = Led(board, led_pin)
 
+# board.set_pin_mode(led_pin, "PWM")
+
+# led.pin = 6
+
+# board.setpin(led, 6)
+
 
 # Creating a new button object
 # async def callback_function(data):
@@ -34,17 +40,17 @@ async def loop():
     led.on()
     print("on")
     await asyncio.sleep(1)
-    await led.off()
+    led.off()
     print("off")
     await asyncio.sleep(1)
     led.on()
-    # await led.intensity = 100
+    led.intensity = 100
     print("100")
     await asyncio.sleep(1)
-    # await led.intensity(255)
+    led.intensity = 255
     print("255")
     await asyncio.sleep(1)
-    await led.off()
+    led.off()
 
 
 

@@ -16,23 +16,24 @@ class Led(Actuator):
         # set the event loop
         self.loop = asyncio.get_event_loop()
 
+        
         # Start the async init
         self.loop.run_until_complete(self.async_init())
 
     # Set the pin of the led
     # call this method if you initialize the class in an async function
     async def async_init(self):
-        await self.board.set_pin_mode(self.pin, PIN_MODE.PWM)
+        self.board.set_pin_mode(self.pin, PIN_MODE.PWM)
 
 
-    async def toggle(self):
+    def toggle(self):
         """
         Toggle the led on or off \n
         """
         if self.__status:
-            await self.off(self)
+            self.off(self)
         else:
-            await self.on(self)
+            self.on(self)
 
     
     def on(self):
@@ -40,16 +41,15 @@ class Led(Actuator):
         Turn the led on \n
         """
         self.__status = True
-        loop = asyncio.get_event_loop()
-        loop.create_task(self.board.write_to_pin(self.pin, WRITE_MODE.PWM, 255))
+        self.board.write_to_pin(self.pin, WRITE_MODE.PWM, 255)
         # await self.board.write_to_pin(self.pin, WRITE_MODE.PWM, 255)
     
-    async def off(self):
+    def off(self):
         """
         Turn the led off \n
         """
         self.__status = False
-        await self.board.write_to_pin(self.pin, WRITE_MODE.PWM, 0)
+        self.board.write_to_pin(self.pin, WRITE_MODE.PWM, 0)
 
 
 
@@ -62,9 +62,9 @@ class Led(Actuator):
        
      
     @intensity.setter
-    async def intensity(self, intensity: int):
+    def intensity(self, intensity: int):
         self.__intensity = intensity
-        await self.board.write_to_pin(self.pin, WRITE_MODE.PWM, intensity)
+        self.board.write_to_pin(self.pin, WRITE_MODE.PWM, intensity)
 
   
 
