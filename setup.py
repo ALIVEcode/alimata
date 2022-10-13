@@ -13,31 +13,22 @@ HERE = pathlib.Path(__file__).parent
 README = (HERE / "README.md").read_text()
 
 if __name__ == "__main__":
-    setup(name='aliot-py',
+    setup(name='alimata',
           author='Nils',
           author_email="alivecode.developers@gmail.com",
           version=alimata.__version__,
-          description='Aliot-py is the python implementation of the Aliot library, an'
-                      ' IOT library made to work with the ALIVEIoT ecosystem (see https://alivecode.ca/iot)',
+          description='Alimata is a Python library to simplify the use of the pymata-express library.',
           long_description=README,
           long_description_content_type="text/markdown",
           classifiers=[
               "Programming Language :: Python :: 3",
               "Programming Language :: Python :: 3.7",
           ],
-          url="https://github.com/ALIVEcode/aliot/tree/aliot2",
+          url="https://github.com/ALIVEcode/alimata",
           packages=find_packages(
-              include=['aliot', 'aliot.*']),
+              include=['alimata', 'alimata.*']),
           include_package_data=True,
           python_requires=">=3.7",
-          install_requires=["websocket-client~=1.3.2",
-                            "rich~=12.3.0",
-                            "click~=8.1.3",
-                            "requests~=2.27.1",
-                            "setuptools==62.1.0"
-                            ],
+          install_requires=["pymata-express>=2.0.0"],
           setup_requires="setuptools",
-          entry_points={
-              "console_scripts": ["aliot = aliot.core._cli.aliot_cli:main"]
-          },
           )
