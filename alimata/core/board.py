@@ -17,6 +17,9 @@ class Board:
         # start the setup function
         await self.__setup()
 
+        
+        self.__is_started = True
+
         # loop the loop function
         while True:
             await self.__loop()
@@ -25,7 +28,6 @@ class Board:
         if self.__is_started == True:
             print_warning("Board is already started, not starting again")
         else:
-            self.__is_started = True
 
             # saving the functions
             self.__setup = setup
@@ -41,6 +43,10 @@ class Board:
             except (KeyboardInterrupt, RuntimeError) as e:
                 loop.run_until_complete(self.shutdown())
                 sys.exit(0)
+
+    @property
+    def is_started(self):
+        return self.__is_started
 
     async def shutdown(self):
         await self.__board.shutdown()

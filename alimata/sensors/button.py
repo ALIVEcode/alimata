@@ -17,7 +17,7 @@ class Button(Sensor):
         else:
             self.__value = bool(data[2])
 
-        if self.__callback is not None:
+        if self.__callback is not None and self.board.is_started:
             if is_async_function(self.__callback):
                 await self.__callback(data)
             else:
