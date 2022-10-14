@@ -12,9 +12,13 @@ class Button(Sensor):
     ----------
     value : bool
         the value of the Button (Pressed or Released)
+    pin : str
+        the pin of the Button
+    invert : bool
+        if the button is inverted or not
     """
 
-    def __init__(self, board: Board, pin, invert: bool = False, callback=None):
+    def __init__(self, board: Board, pin: str, invert: bool = False, callback=None):
         self.board = board
         self.pin = pin
         self.invert = invert
