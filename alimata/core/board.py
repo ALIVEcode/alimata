@@ -6,6 +6,16 @@ import asyncio, sys
 class Board:
 
     def __init__(self, board_id: int = 1, COM_port=None, baud_rate=115200):
+        """
+        Create a new board object 
+        
+        Optional arguments:
+        -------
+        board_id -- The board id in firmata, default is 1 \n
+        COM_port -- The COM port of the board, default is None \n
+        baud_rate -- The baud rate of the board, default is 115200
+
+        """
         self.__board = pymata_express.PymataExpress(arduino_instance_id=board_id, com_port=COM_port,
                                                     baud_rate=baud_rate)
         self.board_id = board_id
@@ -25,6 +35,14 @@ class Board:
             await self.__loop()
 
     def start(self, setup, loop):
+        """
+        For starting the board 
+
+        Arguments:
+        -------
+        setup -- The setup function \n
+        loop -- The loop function
+        """
         if self.__is_started == True:
             print_warning("Board is already started, not starting again")
         else:
@@ -46,6 +64,9 @@ class Board:
 
     @property
     def is_started(self):
+        """
+        Get the status of the board [True/False]
+        """
         return self.__is_started
 
     async def shutdown(self):
@@ -54,6 +75,14 @@ class Board:
     
     # Converting the analog pin value to the correct one depending on the board and function used
     async def parse_pin_number(self, pin: str, pin_type):
+        """
+        Converting the analog pin value to the correct one depending on the board and function used
+
+        Arguments:
+        -------
+        pin -- The pin number in the format A* or just the number \n
+        pin_type -- The type of the pin [PIN_MODE or WRITE_MODE]
+        """
         if pin.startswith("A"): #Check if it's an analog pin
             pin = pin[1:]
             if pin_type != "ANALOG":
@@ -63,6 +92,25 @@ class Board:
 
     async def set_pin_mode(self, pin: str, type: str, callback=None, differential=1, echo_pin=None, timeout=8000,
                            sensor_type="DHT11", min_pulse=544, max_pulse=2400):
+        """
+        Set the pin mode
+
+        Arguments:
+        -------
+        pin -- The pin number in the format A* or just the number \n
+        type -- The type of the pin [PIN_MODE] \n
+
+        Optional arguments:
+        -------
+        callback -- The callback function, default is None \n
+        differential -- This value needs to be met for a callback to be invoked, default is 1 \n
+        echo_pin -- The echo pin number MANDATORY for sonar, default is None \n
+        timeout -- The timeout value only for the sonar, default is 8000 \n
+        sensor_type -- The sensor type of DHT, default is DHT11, Valid values = DHT11, DHT12, DHT22, DHT21, AM2301 \n
+        min_pulse -- The min pulse value, default is 544 \n
+        max_pulse -- The max pulse value, default is 2400
+
+        """
         pin = await self.parse_pin_number(str(pin), type)
 
         if type == "INPUT":
@@ -86,6 +134,25 @@ class Board:
         
     # Use PWM for analog write
     async def write_to_pin(self, pin, type: str, value: int, duration: int = 500, step: int = 1):
+        """
+        Set the pin mode
+
+        Arguments:
+        -------
+        pin -- The pin number in the format A* or just the number \n
+        type -- The type of the pin [PIN_MODE] \n
+
+        Optional arguments:
+        -------
+        callback -- The callback function, default is None \n
+        differential -- This value needs to be met for a callback to be invoked, default is 1 \n
+        echo_pin -- The echo pin number MANDATORY for sonar, default is None \n
+        timeout -- The timeout value only for the sonar, default is 8000 \n
+        sensor_type -- The sensor type of DHT, default is DHT11, Valid values = DHT11, DHT12, DHT22, DHT21, AM2301 \n
+        min_pulse -- The min pulse value, default is 544 \n
+        max_pulse -- The max pulse value, default is 2400
+
+        """
         pin = await self.parse_pin_number(str(pin), type)
 
         if type == "PWM":

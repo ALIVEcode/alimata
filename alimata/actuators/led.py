@@ -80,6 +80,9 @@ class Led(Actuator):
      
     @intensity.setter
     async def intensity(self, intensity: int):
+        """
+        Set the intensity of the led [0-255]\n
+        """        
         self.__intensity = intensity
         await self.board.write_to_pin(self.pin, WRITE_MODE.PWM, intensity)
 
@@ -94,6 +97,8 @@ class Led(Actuator):
     
     @status.setter
     async def status(self, status: bool):
+        """
+        Set the status of the led [True/False]\n"""
         self.__status = status
         if status:
             await self.on()
