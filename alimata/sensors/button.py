@@ -19,46 +19,30 @@ class Button(Sensor):
     """
 
     def __init__(self, board: Board, pin: str, invert: bool = False, callback=None):
-        self.board = board
-        self.pin = pin
+
         self.invert = invert
-        self.__value = False
-        self.__callback = callback
-
-        # self.callback = callback or self.__is_pressed_callback
-
-        # set the event loop
-        self.loop = asyncio.get_event_loop()
-
-        # Start the async init
-        self.loop.run_until_complete(self.async_init())
-
-
-
-    # Set the pin and callback of the button
-    # call this method if you initialize the class in an async function
-    async def async_init(self):
-        await self.board.set_pin_mode(self.pin, PIN_MODE.PULLUP, self.__has_changed_callback)
+        Sensor.__init__(self, board=board, pin=pin, callback=callback, type=PIN_MODE.PULLUP)
+        
 
 
     @property
-    def value(self):
+    def data(self):
         """Return the current status of the button (True or False)"""
-        return self.__value
+        return self._Sensor__data
 
 
     # Change the status of the button when pressed
-    async def __has_changed_callback(self, data):
+    async def _Sensor__is_changed_callback(self, data):
         try:
             if self.invert:
-                self.__value = not bool(data[2])
+                self._Sensor__data = not bool(data[2])
             else:
-                self.__value = bool(data[2])
+                self._Sensor__data = bool(data[2])
 
-            if self.__callback is not None and self.board.is_started:
-                if is_async_function(self.__callback):
-                    await self.__callback(self)
+            if self._Sensor__callback is not None and self.board.is_started:
+                if is_async_function(self._Sensor__callback):
+                    await self._Sensor__callback(self)
                 else:
-                    self.__callback(self)
+                    self._Sensor__callback(self)
         except Exception as e:
             print(e)

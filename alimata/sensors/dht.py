@@ -18,10 +18,16 @@ class DHT(Sensor):
         the data of the DHT sensor
     pin : str
         the pin of the Button
+
+    Methods
+    -------
+    is_ready()
+        Return True if the sensor is ready to be used
+        
     """
 
     def __init__(self, board: Board, pin: str, callback=None):
-        
+
         Sensor.__init__(self, board=board, pin=pin, callback=callback, type=PIN_MODE.DHT, sensor_type=DHT_SENSOR_TYPE.DHT11)
 
 

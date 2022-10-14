@@ -6,6 +6,12 @@ from abc import ABC, abstractmethod
 
 
 class Sensor(ABC):
+    """
+    Abstract Methods
+    ----------------
+    is_ready()
+        Return True if the sensor is ready to be used
+    """
 
     # Constructor of the class Sensor
     def __init__(self, 
