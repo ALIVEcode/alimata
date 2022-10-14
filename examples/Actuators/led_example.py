@@ -37,20 +37,20 @@ async def setup():
 
 async def loop():
     await sleep(1)
-    led.on()
+    await led.on()
     print("on")
     await sleep(1)
-    led.off()
+    await led.off()
     print("off")
     await sleep(1)
-    led.on()
+    await led.on()
     led.intensity = 100
     print("100")
     await sleep(1)
     led.intensity = 255
     print("255")
     await sleep(1)
-    led.off()
+    await led.off()
 
 
 

@@ -1,4 +1,3 @@
-import string
 from alimata.core.board import Board
 from alimata.core.core import PIN_MODE, WRITE_MODE
 from alimata.actuators.actuator import Actuator
@@ -28,7 +27,7 @@ class Led(Actuator):
     """
     def __init__(self, board: Board, pin):
         self.board = board
-        self.pin : string = pin
+        self.pin : str = pin
         self.__status : bool = True
         self.__intensity : int = 255
 
@@ -42,33 +41,32 @@ class Led(Actuator):
     # Set the pin of the led
     # call this method if you initialize the class in an async function
     async def async_init(self):
-        self.board.set_pin_mode(self.pin, PIN_MODE.PWM)
+        await self.board.set_pin_mode(self.pin, PIN_MODE.PWM)
 
 
-    def toggle(self):
+    async def toggle(self):
         """
         Toggle the led on or off \n
         """
         if self.__status:
-            self.off(self)
+            await self.off(self)
         else:
-            self.on(self)
+            await self.on(self)
 
     
-    def on(self):
+    async def on(self):
         """
         Turn the led on \n
         """
         self.__status = True
-        self.board.write_to_pin(self.pin, WRITE_MODE.PWM, self.__intensity)
-        # await self.board.write_to_pin(self.pin, WRITE_MODE.PWM, 255)
+        await self.board.write_to_pin(self.pin, WRITE_MODE.PWM, 255)
     
-    def off(self):
+    async def off(self):
         """
         Turn the led off \n
         """
         self.__status = False
-        self.board.write_to_pin(self.pin, WRITE_MODE.PWM, 0)
+        await self.board.write_to_pin(self.pin, WRITE_MODE.PWM, 0)
 
 
 
@@ -81,9 +79,9 @@ class Led(Actuator):
        
      
     @intensity.setter
-    def intensity(self, intensity: int):
+    async def intensity(self, intensity: int):
         self.__intensity = intensity
-        self.board.write_to_pin(self.pin, WRITE_MODE.PWM, intensity)
+        await self.board.write_to_pin(self.pin, WRITE_MODE.PWM, intensity)
 
   
 
@@ -95,9 +93,9 @@ class Led(Actuator):
         return self.__status
     
     @status.setter
-    def status(self, status: bool):
+    async def status(self, status: bool):
         self.__status = status
         if status:
-            self.on()
+            await self.on()
         else:
-            self.off()
+            await self.off()
