@@ -1,6 +1,6 @@
 from alimata.sensors.button import Button
 from alimata.core.board import Board
-import asyncio
+from asyncio import sleep
 
 #Defining the pin of the button sensor (the other pin is connected to ground or 5v)
 pin = 2
@@ -20,7 +20,9 @@ async def setup():
     print("Starting main")
 
 async def loop():
-    await asyncio.sleep(1)
+    # print(button.value)
+    print("pressed : " + button.value)
+    await sleep(1)
 
 
 board.start(setup, loop)

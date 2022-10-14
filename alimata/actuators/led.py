@@ -1,4 +1,3 @@
-import string
 from alimata.core.board import Board
 from alimata.core.core import PIN_MODE, WRITE_MODE
 from alimata.actuators.actuator import Actuator
@@ -28,7 +27,7 @@ class Led(Actuator):
     """
     def __init__(self, board: Board, pin):
         self.board = board
-        self.pin : string = pin
+        self.pin : str = pin
         self.__status : bool = True
         self.__intensity : int = 255
 
@@ -42,7 +41,7 @@ class Led(Actuator):
     # Set the pin of the led
     # call this method if you initialize the class in an async function
     async def async_init(self):
-        self.board.set_pin_mode(self.pin, PIN_MODE.PWM)
+        await self.board.set_pin_mode(self.pin, PIN_MODE.PWM)
 
 
     def toggle(self):

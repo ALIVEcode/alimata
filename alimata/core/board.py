@@ -6,40 +6,40 @@ import asyncio, sys
 class Board:
 
     def __init__(self, board_id: int = 1, COM_port=None, baud_rate=115200):
-        self.__board = pymata_express.PymataExpress(arduino_instance_id=board_id, com_port=COM_port,
-                                                    baud_rate=baud_rate)
+        self.__board = pymata_express.PymataExpress(arduino_instance_id=board_id, com_port=COM_port, baud_rate=baud_rate, arduino_wait=2)
         self.board_id = board_id
         self.__is_started = False
         self.__num_of_digital_pins = len(self.__board.digital_pins)
         self.__num_of_analog_pins = len(self.__board.analog_pins)
 
+        # get the event loop
+        self.__loop = asyncio.get_event_loop()
+
     async def __main(self):
         # start the setup function
-        await self.__setup()
+        await self.__setup_func()
 
         # loop the loop function
         while True:
-            await self.__loop()
+            await self.__loop_func()
 
-    def start(self, setup, loop):
+    def start(self, setup_func, loop_func):
         if self.__is_started == True:
             print_warning("Board is already started, not starting again")
         else:
             self.__is_started = True
 
             # saving the functions
-            self.__setup = setup
-            self.__loop = loop
+            self.__setup_func = setup_func
+            self.__loop_func = loop_func
 
-            # get the event loop
-            loop = asyncio.get_event_loop()
 
             try:
                 # start the main function
-                loop.run_until_complete(self.__main())
+                self.__loop.run_until_complete(self.__main())
 
             except (KeyboardInterrupt, RuntimeError) as e:
-                loop.run_until_complete(self.shutdown())
+                self.__loop.run_until_complete(self.shutdown())
                 sys.exit(0)
 
     async def shutdown(self):
@@ -55,25 +55,25 @@ class Board:
         return int(pin)
 
 
-    def set_pin_mode(self, pin: str, type: str, callback=None, differential=1, echo_pin=None, timeout=8000,
+    async def set_pin_mode(self, pin: str, type: str, callback=None, differential=1, echo_pin=None, timeout=8000,
                            sensor_type="DHT11", min_pulse=544, max_pulse=2400):
         pin = self.parse_pin_number(str(pin), type)
 
         if type == "INPUT":
-            asyncio.create_task(self.__board.set_pin_mode_digital_input(pin, callback))
+            await self.__board.set_pin_mode_digital_input(pin, callback)
         elif type == "OUTPUT":
-            asyncio.create_task(self.__board.set_pin_mode_digital_output(pin))
+            await self.__board.set_pin_mode_digital_output(pin)
         elif type == "PULLUP":
-            asyncio.create_task(self.__board.set_pin_mode_digital_input_pullup(pin, callback))
+            await self.__board.set_pin_mode_digital_input_pullup(pin, callback)
         elif type == "ANALOG":
-            asyncio.create_task(self.__board.set_pin_mode_analog_input(pin, callback, differential))
+            await self.__board.set_pin_mode_analog_input(pin, callback, differential)
         elif type == "PWM":
-            asyncio.create_task(self.__board.set_pin_mode_pwm_output(pin))
+            await self.__board.set_pin_mode_pwm_output(pin)
         elif type == "SONAR":
             if echo_pin is None:
                 raise TypeError("echo_pin is required to setup a sonar")
             else:
-                asyncio.create_task(self.__board.set_pin_mode_sonar(pin, echo_pin, callback, timeout))
+                await self.__board.set_pin_mode_sonar(pin, echo_pin, callback, timeout)
         else:
             raise TypeError("type must be INPUT, OUTPUT, PULLUP, ANALOG, PWM or SONAR")
 
