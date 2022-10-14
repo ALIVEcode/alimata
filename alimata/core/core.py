@@ -25,6 +25,17 @@ class PIN_MODE(str, Enum):
     ANALOG = "ANALOG"
     PWM = "PWM"
     SONAR = "SONAR"
+    DHT = "DHT"
+    SERVO = "SERVO"
+    STEPPER = "STEPPER"
+    TONE = "TONE"
+
+class DHT_SENSOR_TYPE(str, Enum):
+    DHT11 = "DHT11"
+    DHT12 = "DHT12"
+    DHT22 = "DHT22"
+    DHT21 = "DHT21"
+    AM2301 = "AM2301"
 
 
 class WRITE_MODE(str, Enum):

@@ -1,4 +1,4 @@
-from alimata.core.core import PIN_MODE, WRITE_MODE, print_warning
+from alimata.core.core import PIN_MODE, WRITE_MODE, DHT_SENSOR_TYPE, print_warning
 from pymata_express import pymata_express
 import asyncio, sys
 
@@ -61,8 +61,8 @@ class Board:
         return int(pin)
 
 
-    async def set_pin_mode(self, pin: str, type: str, callback=None, differential=1, echo_pin=None, timeout=8000,
-                           sensor_type="DHT11", min_pulse=544, max_pulse=2400):
+    async def set_pin_mode(self, pin: str, type: str, callback=None, differential: int = 1, echo_pin: str = None, timeout: int = 8000,
+                           sensor_type: str = None, min_pulse: int = 544, max_pulse:int =2400, step_per_revolution: int = None):
         pin = self.parse_pin_number(str(pin), type)
 
         if type == "INPUT":
@@ -80,6 +80,22 @@ class Board:
                 raise TypeError("echo_pin is required to setup a sonar")
             else:
                 await self.__board.set_pin_mode_sonar(pin, echo_pin, callback, timeout)
+        elif type == "DHT":
+            if sensor_type is None:
+                raise TypeError("sensor_type is required to setup a DHT sensor")
+            else:
+                await self.__board.set_pin_mode_dht(pin, sensor_type, differential, callback)
+        elif type == "SERVO":
+            await self.__board.set_pin_mode_servo(pin, min_pulse, max_pulse)
+        elif type == "STEPPER":
+            if step_per_revolution is None:
+                raise TypeError("step_per_revolution is required to setup a stepper motor")
+            elif len(pin) != 2 or len(pin) != 4:
+                raise TypeError("pin must be a list of 2 or 4 pins")
+            else:
+                await self.__board.set_pin_mode_stepper(step_per_revolution, pin)
+        elif type == "TONE":
+            await self.__board.set_pin_mode_tone(pin)
         else:
             raise TypeError("type must be INPUT, OUTPUT, PULLUP, ANALOG, PWM or SONAR")
 
