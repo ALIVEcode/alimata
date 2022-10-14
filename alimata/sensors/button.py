@@ -38,7 +38,7 @@ class Button(Sensor):
     # Set the pin and callback of the button
     # call this method if you initialize the class in an async function
     async def async_init(self):
-        await self.board.set_pin_mode(self.pin, PIN_MODE.PULLUP, self.__is_pressed_callback)
+        await self.board.set_pin_mode(self.pin, PIN_MODE.PULLUP, self.__has_changed_callback)
 
 
     @property
@@ -48,15 +48,17 @@ class Button(Sensor):
 
 
     # Change the status of the button when pressed
-    async def __is_pressed_callback(self, data):
-        # print(data)
-        if self.invert:
-            self.__value = not bool(data[2])
-        else:
-            self.__value = bool(data[2])
-
-        if self.__callback is not None and self.board.is_started:
-            if is_async_function(self.__callback):
-                await self.__callback(self)
+    async def __has_changed_callback(self, data):
+        try:
+            if self.invert:
+                self.__value = not bool(data[2])
             else:
-                self.__callback(self)
+                self.__value = bool(data[2])
+
+            if self.__callback is not None and self.board.is_started:
+                if is_async_function(self.__callback):
+                    await self.__callback(self)
+                else:
+                    self.__callback(self)
+        except Exception as e:
+            print(e)

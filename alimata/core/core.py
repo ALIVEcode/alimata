@@ -30,12 +30,12 @@ class PIN_MODE(str, Enum):
     STEPPER = "STEPPER"
     TONE = "TONE"
 
-class DHT_SENSOR_TYPE(str, Enum):
-    DHT11 = "DHT11"
-    DHT12 = "DHT12"
-    DHT22 = "DHT22"
-    DHT21 = "DHT21"
-    AM2301 = "AM2301"
+class DHT_SENSOR_TYPE(int, Enum):
+    DHT11 = 11
+    DHT12 = 12
+    DHT22 = 22
+    DHT21 = 21
+    # AM2301 = "AM2301"
 
 
 class WRITE_MODE(str, Enum):

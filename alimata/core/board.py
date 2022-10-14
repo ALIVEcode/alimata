@@ -62,7 +62,7 @@ class Board:
 
 
     async def set_pin_mode(self, pin: str, type: str, callback=None, differential: int = 1, echo_pin: str = None, timeout: int = 8000,
-                           sensor_type: str = None, min_pulse: int = 544, max_pulse:int =2400, step_per_revolution: int = None):
+                           sensor_type: int = None, min_pulse: int = 544, max_pulse:int =2400, step_per_revolution: int = None):
         pin = self.parse_pin_number(str(pin), type)
 
         if type == "INPUT":
@@ -130,3 +130,7 @@ class Board:
             asyncio.create_task(self.__board.stepper_write(pin, value, step))
         else:
             raise TypeError("type must be ANALOG, PWM, DIGITAL, TONE, TONE_CONTINUOUS, TONE_STOP, SERVO or STEPPER")
+    
+    @property
+    def pymata_board(self):
+        return self.__board
