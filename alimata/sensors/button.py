@@ -1,7 +1,6 @@
 from alimata.core.core import is_async_function, PIN_MODE
 from alimata.sensors.sensor import Sensor
 from alimata.core.board import Board
-import asyncio
 
 
 class Button(Sensor):
@@ -19,10 +18,11 @@ class Button(Sensor):
     """
 
     def __init__(self, board: Board, pin: str, invert: bool = False, callback=None):
+        
+        Sensor.__init__(self, board=board, pin=pin, callback=callback, type=PIN_MODE.PULLUP)
 
         self.invert = invert
-        Sensor.__init__(self, board=board, pin=pin, callback=callback, type=PIN_MODE.PULLUP)
-        
+
 
 
     @property
@@ -34,15 +34,15 @@ class Button(Sensor):
     # Change the status of the button when pressed
     async def _Sensor__is_changed_callback(self, data):
         try:
-            if self.invert:
-                self._Sensor__data = not bool(data[2])
-            else:
-                self._Sensor__data = bool(data[2])
-
-            if self._Sensor__callback is not None and self.board.is_started:
-                if is_async_function(self._Sensor__callback):
-                    await self._Sensor__callback(self)
+            if self.board.is_started:
+                if self.invert:
+                    self._Sensor__data = not bool(data[2])
                 else:
-                    self._Sensor__callback(self)
+                    self._Sensor__data = bool(data[2])
+                if Sensor.is_ready(self) and self._Sensor__callback is not None:
+                    if is_async_function(self._Sensor__callback):
+                        await self._Sensor__callback(self)
+                    else:
+                        self._Sensor__callback(self)
         except Exception as e:
             print(e)

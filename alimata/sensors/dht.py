@@ -1,7 +1,6 @@
 from alimata.core.core import DHT_SENSOR_TYPE, is_async_function, PIN_MODE
 from alimata.sensors.sensor import Sensor
 from alimata.core.board import Board
-import asyncio
 
 
 class DHT(Sensor):
@@ -51,11 +50,10 @@ class DHT(Sensor):
 
     async def _Sensor__is_changed_callback(self, data):
         """Callback when the sensor's data has changed enough"""
-        print('henlo')
         try:
             if self.board.is_started:
                 self._Sensor__data = [data[4], data[5]]
-                if self._Sensor__callback is not None:
+                if Sensor.is_ready(self) and self._Sensor__callback is not None:
                     if is_async_function(self._Sensor__callback):
                         await self._Sensor__callback(self)
                     else:
