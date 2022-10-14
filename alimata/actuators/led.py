@@ -1,12 +1,31 @@
 import string
 from alimata.core.board import Board
-from alimata.core.core import PIN_MODE, WRITE_MODE, maprange, print_warning
+from alimata.core.core import PIN_MODE, WRITE_MODE
 from alimata.actuators.actuator import Actuator
 import asyncio
 
 
 
 class Led(Actuator):
+    """
+    A class used to represent a Led
+
+    Attributes
+    ----------
+    status : bool
+        the status of the led (on or off)
+    intensity : int
+        the intensity of the led (0-255)
+
+    Methods
+    -------
+    toggle()
+        Toggle the led on or off
+    on()
+        Turn the led on
+    off()
+        Turn the led off
+    """
     def __init__(self, board: Board, pin):
         self.board = board
         self.pin : string = pin
@@ -41,7 +60,7 @@ class Led(Actuator):
         Turn the led on \n
         """
         self.__status = True
-        self.board.write_to_pin(self.pin, WRITE_MODE.PWM, 255)
+        self.board.write_to_pin(self.pin, WRITE_MODE.PWM, self.__intensity)
         # await self.board.write_to_pin(self.pin, WRITE_MODE.PWM, 255)
     
     def off(self):
@@ -71,24 +90,14 @@ class Led(Actuator):
     @property
     def status(self):
         """
-        Get the current status of the led [True/False]\n
+        Get or Set the current status of the led [True/False]\n
         """
         return self.__status
     
-
-
-    # Set the status of the led
-    # Intensity should be bettewn 0 and 100
-    # async def set_status(self, status: int, intensity: int = 100):
-    #     self.__status = status
-    #     if self.__status == 0:
-    #         await self.board.write_to_pin(self.pin, WRITE_MODE.DIGITAL, 0)
-    #     elif intensity >= 0 and intensity < 100:
-    #         intensity_mapped = int(maprange(intensity, 0, 100, 0, 255))
-    #         await self.board.write_to_pin(self.pin, WRITE_MODE.PWM, intensity_mapped)
-    #     elif intensity > 100:
-    #         print_warning("Intensity is greater than 100, setting intensity to 100")
-    #         await self.board.write_to_pin(self.pin, WRITE_MODE.DIGITAL, 1)
-    #     elif intensity < 0:
-    #         print_warning("Intensity is less than 0, setting intensity to 0")
-    #         await self.board.write_to_pin(self.pin, WRITE_MODE.DIGITAL, 0)
+    @status.setter
+    def status(self, status: bool):
+        self.__status = status
+        if status:
+            self.on()
+        else:
+            self.off()

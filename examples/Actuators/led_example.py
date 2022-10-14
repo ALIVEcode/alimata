@@ -1,7 +1,7 @@
 from alimata.actuators.led import Led
 from alimata.sensors.button import Button
 from alimata.core.board import Board
-import asyncio
+from asyncio import sleep
 
 # Defining the pin of the button (the other pin is connected to ground or 5v)
 # button_pin = 2
@@ -36,20 +36,20 @@ async def setup():
 
 
 async def loop():
-    await asyncio.sleep(1)
+    await sleep(1)
     led.on()
     print("on")
-    await asyncio.sleep(1)
+    await sleep(1)
     led.off()
     print("off")
-    await asyncio.sleep(1)
+    await sleep(1)
     led.on()
     led.intensity = 100
     print("100")
-    await asyncio.sleep(1)
+    await sleep(1)
     led.intensity = 255
     print("255")
-    await asyncio.sleep(1)
+    await sleep(1)
     led.off()
 
 
