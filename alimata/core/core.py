@@ -13,7 +13,6 @@ def is_async_function(func):
 def maprange(value: int, from_min: int, from_max: int, to_min: int, to_max: int):
     return to_min + ((value - from_min) * (to_max - to_min) / (from_max - to_min))
 
-
 def print_warning(message: str = ""):
     print("Warning : ", message)
 

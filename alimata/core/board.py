@@ -1,13 +1,36 @@
 from alimata.core.core import PIN_MODE, WRITE_MODE, DHT_SENSOR_TYPE, print_warning
 from pymata_express import pymata_express
-import asyncio, sys
+import asyncio, sys, datetime
 
 
 class Board:
+    """
+    A class used to represent the arduino board
+
+    Attributes
+    ----------
+    board_id : int
+        The id of the board same as in firmata (read only)
+    start : function
+        Starting the board : (setup_func, loop_func)
+    shutdown : function
+        Shutdown the board
+    is_started : bool
+        Retuns if the board is started or not (read only)
+    pymata_board : pymata_express
+        The pymata_express board object (read only)
+    set_pin_mode : function
+        Setting the pin mode : (pin, type, callback=None, differential=1, echo_pin=None, timeout=8000, sensor_type=None, min_pulse=544, max_pulse=2400, step_per_revolution=None)
+    write_pin : function
+        Writing to a pin : (pin, type, value, duration, step)
+    parse_pin_number : function
+        Converting the analog pin value to the correct one depending on the board and function used : (pin, pin_type)
+    
+    """
 
     def __init__(self, board_id: int = 1, COM_port=None, baud_rate=115200):
         self.__board = pymata_express.PymataExpress(arduino_instance_id=board_id, com_port=COM_port, baud_rate=baud_rate, arduino_wait=2)
-        self.board_id = board_id
+        self.__board_id = board_id
         self.__is_started = False
         self.__num_of_digital_pins = len(self.__board.digital_pins)
         self.__num_of_analog_pins = len(self.__board.analog_pins)
@@ -23,7 +46,7 @@ class Board:
         self.__is_started = True
 
         # loop the loop function
-        while True:
+        while self.__is_started:
             await self.__loop_func()
 
     def start(self, setup_func, loop_func):
@@ -41,15 +64,25 @@ class Board:
                 self.__loop.run_until_complete(self.__main())
 
             except (KeyboardInterrupt, RuntimeError) as e:
-                self.__loop.run_until_complete(self.shutdown())
+                self.shutdown()
                 sys.exit(0)
 
     @property
     def is_started(self):
         return self.__is_started
+    
+    @property
+    def board_id(self):
+        return self.__board_id
 
-    async def shutdown(self):
-        await self.__board.shutdown()
+    def shutdown(self):
+        self.__is_started = False
+        tasks = asyncio.all_tasks()
+        for t in tasks:
+            t.cancel()
+
+        print("SHUTING DOWN BOARD ! | ID : " + str(self.__board_id) + " | TIME : " + str(datetime.datetime.now().strftime("%H:%M:%S")))
+        self.__loop.run_until_complete(self.__board.shutdown())
 
     
     # Converting the analog pin value to the correct one depending on the board and function used

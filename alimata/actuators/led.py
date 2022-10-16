@@ -1,7 +1,6 @@
 from alimata.core.board import Board
 from alimata.core.core import PIN_MODE, WRITE_MODE
 from alimata.actuators.actuator import Actuator
-import asyncio
 
 
 
@@ -11,7 +10,7 @@ class Led(Actuator):
 
     Attributes
     ----------
-    status : bool
+    data : bool
         the status of the led (on or off)
     intensity : int
         the intensity of the led (0-255)
@@ -26,29 +25,15 @@ class Led(Actuator):
         Turn the led off
     """
     def __init__(self, board: Board, pin):
-        self.board = board
-        self.pin : str = pin
-        self.__status : bool = True
-        self.__intensity : int = 255
-
-        # set the event loop
-        self.loop = asyncio.get_event_loop()
-
-        
-        # Start the async init
-        self.loop.run_until_complete(self.async_init())
-
-    # Set the pin of the led
-    # call this method if you initialize the class in an async function
-    async def async_init(self):
-        await self.board.set_pin_mode(self.pin, PIN_MODE.PWM)
+        Actuator.__init__(self, board=board, pin=pin, type=PIN_MODE.PWM)
+        self._Actuator__data = False
 
 
     def toggle(self):
         """
         Toggle the led on or off \n
         """
-        if self.__status:
+        if self._Actuator__data:
             self.off(self)
         else:
             self.on(self)
@@ -58,7 +43,7 @@ class Led(Actuator):
         """
         Turn the led on \n
         """
-        self.__status = True
+        self._Actuator__data = True
         self.board.write_to_pin(self.pin, WRITE_MODE.PWM, self.__intensity)
         # await self.board.write_to_pin(self.pin, WRITE_MODE.PWM, 255)
     
@@ -66,7 +51,7 @@ class Led(Actuator):
         """
         Turn the led off \n
         """
-        self.__status = False
+        self._Actuator__data = False
         self.board.write_to_pin(self.pin, WRITE_MODE.PWM, 0)
 
 
@@ -87,15 +72,15 @@ class Led(Actuator):
   
 
     @property
-    def status(self):
+    def data(self):
         """
         Get or Set the current status of the led [True/False]\n
         """
-        return self.__status
+        return self._Actuator__data
     
-    @status.setter
-    def status(self, status: bool):
-        self.__status = status
+    @data.setter
+    def data(self, status: bool):
+        self._Actuator__data = status
         if status:
             self.on()
         else:
