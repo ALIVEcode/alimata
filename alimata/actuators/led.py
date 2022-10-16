@@ -27,6 +27,7 @@ class Led(Actuator):
     def __init__(self, board: Board, pin):
         Actuator.__init__(self, board=board, pin=pin, type=PIN_MODE.PWM)
         self._Actuator__data = False
+        self.__intensity = 255
 
 
     def toggle(self):
