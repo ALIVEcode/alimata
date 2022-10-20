@@ -6,7 +6,7 @@ from alimata.actuators.actuator import Actuator
 
 class Led(Actuator):
     """
-    A class used to represent a Led
+    A class used to represent a RGB Led
 
     Attributes
     ----------
