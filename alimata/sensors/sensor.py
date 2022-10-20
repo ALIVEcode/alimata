@@ -2,15 +2,32 @@ from alimata.core.board import Board
 from alimata.core.core import DHT_SENSOR_TYPE, PIN_MODE
 
 import asyncio
-from abc import ABC, abstractmethod
+from abc import ABC, abstractmethod, abstractproperty
 
 
 class Sensor(ABC):
     """
-    Abstract Methods
+    Attributes
+    ----------------
+    __data
+        the value of the sensor \n
+        to access this attribute from a child class : \n
+        *self._Sensor__data*
+    
+    Methods
     ----------------
     is_ready()
         Return True if the sensor is ready to be used
+
+    Abstract Methods
+    ----------------
+    __is_changed_callback(self, data)
+        Callback when the sensor value has changed
+    
+    Abstract Properties
+    ----------------
+    data
+        Return the current value of the sensor
     """
 
     # Constructor of the class Sensor
@@ -38,6 +55,8 @@ class Sensor(ABC):
         self.__sensor_type = sensor_type
 
 
+        # TO ACCESS THIS ATTRIBUTE FROM A CHILD CLASS
+        # USE THE FOLLOWING SYNTAX: self._Sensor__data
         self.__data = None
 
         # set the event loop
@@ -65,14 +84,14 @@ class Sensor(ABC):
         pass
         
     
-    @property
+    @abstractproperty
     def data(self):
         """Return the data of the sensor"""
-        return self._Sensor__data
+        pass
 
     def is_ready(self):
         """Return True if the sensor is ready to read (True or False)"""
-        if self._Sensor__data == None:
+        if self.__data == None:
             return False
         else:
             return True

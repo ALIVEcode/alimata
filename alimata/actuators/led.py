@@ -6,9 +6,9 @@ from alimata.actuators.actuator import Actuator
 
 class Led(Actuator):
     """
-    A class used to represent a RGB Led
+    A class used to represent a Led
 
-    Attributes
+    Properties
     ----------
     data : bool
         the status of the led (on or off)
@@ -26,7 +26,13 @@ class Led(Actuator):
     """
     def __init__(self, board: Board, pin):
         Actuator.__init__(self, board=board, pin=pin, type=PIN_MODE.PWM)
+
+        # Initialises the led to off
+        # TO ACCESS THE PRIVATE VARIABLE from the parent class
+        # USE THE FOLLOWING SYNTAX: self._Actuator__data
         self._Actuator__data = False
+
+        # Initialises the intensity to 255
         self.__intensity = 255
 
 
@@ -44,15 +50,15 @@ class Led(Actuator):
         """
         Turn the led on \n
         """
-        self._Actuator__data = True
-        self.board.write_to_pin(self.pin, WRITE_MODE.PWM, self.__intensity)
+        self._Actuator__data = True # Set the status of the led to on
+        self.board.write_to_pin(self.pin, WRITE_MODE.PWM, self.__intensity) # Set the intensity of the led
         # await self.board.write_to_pin(self.pin, WRITE_MODE.PWM, 255)
     
     def off(self):
         """
         Turn the led off \n
         """
-        self._Actuator__data = False
+        self._Actuator__data = False # Set the status of the led to off
         self.board.write_to_pin(self.pin, WRITE_MODE.PWM, 0)
 
 
@@ -79,9 +85,9 @@ class Led(Actuator):
         """
         return self._Actuator__data
     
+
     @data.setter
     def data(self, status: bool):
-        self._Actuator__data = status
         if status:
             self.on()
         else:

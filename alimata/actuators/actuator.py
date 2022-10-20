@@ -26,7 +26,8 @@ class Actuator(ABC):
         self.__max_pulse = max_pulse
         self.__step_per_revolution = step_per_revolution
 
-
+        # TO ACCESS THIS ATTRIBUTE FROM A CHILD CLASS
+        # USE THE FOLLOWING SYNTAX: self._Actuator__data
         self.__data = None
 
         # set the event loop
@@ -46,11 +47,16 @@ class Actuator(ABC):
             max_pulse=self.__max_pulse,
             step_per_revolution=self.__step_per_revolution)
 
+    # MUST BE IMPLEMENTED IN THE CHILD CLASS
     @property
+    @abstractmethod
     def data(self):
         """Return the data of the actuator"""
-        return self.__data	
+        pass
+
+    # MUST BE IMPLEMENTED IN THE CHILD CLASS
     @data.setter
+    @abstractmethod
     def data(self, value):
         """Set the data of the actuator"""
-        self.__data = value
+        pass

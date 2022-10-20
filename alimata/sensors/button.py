@@ -9,18 +9,28 @@ class Button(Sensor):
 
     Attributes
     ----------
-    value : bool
-        the value of the Button (Pressed or Released)
     pin : str
         the pin of the Button
     invert : bool
         if the button is inverted or not
+
+    Properties
+    ----------
+    data : bool
+        the value of the Button (Pressed (True) or Released (False))
     """
+
+
+    # Instead of using self.__data, we use self._Sensor__data
 
     def __init__(self, board: Board, pin: str, invert: bool = False, callback=None):
         
         Sensor.__init__(self, board=board, pin=pin, callback=callback, type=PIN_MODE.PULLUP)
 
+        # Initialises the button as not pressed
+        # TO ACCESS THE PRIVATE VARIABLE from the parent class
+        # USE THE FOLLOWING SYNTAX: self._Sensor__data
+        self._Sensor__data = False
         self.invert = invert
 
 

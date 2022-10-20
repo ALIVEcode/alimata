@@ -10,18 +10,19 @@ board = Board()
 
 #Only called when the button is pressed or released
 def callback_function(data):
-    print(data[2])
+    print("pressed" + str(data.data))
 
 #Creating a new button object
-button = Button(board, pin, callback=callback_function)
+button = Button(board, pin, callback=callback_function, invert=True)
 
 #Main function
 async def setup():
     print("Starting main")
+    print(dir(button))
 
 async def loop():
     # print(button.value)
-    print("pressed : " + button.value)
+    print(button.data)
     await sleep(1)
 
 
