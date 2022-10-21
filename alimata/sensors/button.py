@@ -30,7 +30,7 @@ class Button(Sensor):
         # Initialises the button as not pressed
         self.__data = False # PRIVATE
 
-        # Initialises the Callback function that is backend (not user defined) 
+        # Initialises the Callback function that is *user defined*
         self.__callback = callback # PRIVATE
 
         # Initialises the invert value
@@ -46,6 +46,7 @@ class Button(Sensor):
 
     # ABSTRACT FROM SENSOR
     # Change the status of the button when pressed
+    # Back end callback function (*not user defined*)
     async def is_changed_callback(self, data):
         try:
             if Sensor.is_ready(self):
