@@ -6,14 +6,7 @@ from abc import ABC, abstractmethod, abstractproperty
 
 
 class Sensor(ABC):
-    """
-    Attributes
-    ----------------
-    __data
-        the value of the sensor \n
-        to access this attribute from a child class : \n
-        *self._Sensor__data*
-    
+    """    
     Methods
     ----------------
     is_ready()
@@ -21,7 +14,7 @@ class Sensor(ABC):
 
     Abstract Methods
     ----------------
-    __is_changed_callback(self, data)
+    is_changed_callback(self, data)
         Callback when the sensor value has changed
     
     Abstract Properties
@@ -35,7 +28,6 @@ class Sensor(ABC):
     pin: str, 
     board: Board,
     type: str, 
-    callback=None, # Facultative        
     differential: int = 1, # Facultative
     echo_pin: str = None, # Facultative
     timeout: int = 8000, # Facultative
@@ -48,16 +40,11 @@ class Sensor(ABC):
 
         # Create Private Attributes
         self.__type = type
-        self.__callback = callback
         self.__differential = differential
         self.__echo_pin = echo_pin
         self.__timeout = timeout
         self.__sensor_type = sensor_type
 
-
-        # TO ACCESS THIS ATTRIBUTE FROM A CHILD CLASS
-        # USE THE FOLLOWING SYNTAX: self._Sensor__data
-        self.__data = None
 
         # set the event loop
         self.loop = asyncio.get_event_loop()
@@ -72,26 +59,30 @@ class Sensor(ABC):
         await self.board.set_pin_mode(
             pin=self.pin,
             type=self.__type,
-            callback=self.__is_changed_callback,
+            callback=self.is_changed_callback,
             differential=self.__differential,
             echo_pin=self.__echo_pin,
             timeout=self.__timeout,
             sensor_type=self.__sensor_type)
     
     @abstractmethod
-    async def __is_changed_callback(self, data):
+    async def is_changed_callback(self, data):
         """Callback when the sensor's value has changed enough"""
         pass
+
+
+    def is_ready(self) -> bool:
+        """Return True if the sensor is ready to read (True or False)"""
+        if self.data == None: # self.data is a property of the child class
+            return False
+        else:
+            if self.board.is_started():
+                return True
+            else:
+                return False
         
     
     @abstractproperty
     def data(self):
         """Return the data of the sensor"""
         pass
-
-    def is_ready(self):
-        """Return True if the sensor is ready to read (True or False)"""
-        if self.__data == None:
-            return False
-        else:
-            return True

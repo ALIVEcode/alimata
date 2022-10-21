@@ -25,34 +25,42 @@ class Button(Sensor):
 
     def __init__(self, board: Board, pin: str, invert: bool = False, callback=None):
         
-        Sensor.__init__(self, board=board, pin=pin, callback=callback, type=PIN_MODE.PULLUP)
+        Sensor.__init__(self, board=board, pin=pin, type=PIN_MODE.PULLUP)
 
         # Initialises the button as not pressed
-        # TO ACCESS THE PRIVATE VARIABLE from the parent class
-        # USE THE FOLLOWING SYNTAX: self._Sensor__data
-        self._Sensor__data = False
-        self.invert = invert
+        self.__data = False # PRIVATE
+
+        # Initialises the Callback function that is backend (not user defined) 
+        self.__callback = callback # PRIVATE
+
+        # Initialises the invert value
+        self.invert = invert # PUBLIC
 
 
-
+    # ABSTRACT FROM SENSOR
     @property
     def data(self):
         """Return the current status of the button (True or False)"""
-        return self._Sensor__data
+        return self.__data
 
 
+    # ABSTRACT FROM SENSOR
     # Change the status of the button when pressed
-    async def _Sensor__is_changed_callback(self, data):
+    async def is_changed_callback(self, data):
         try:
-            if self.board.is_started:
-                if self.invert:
-                    self._Sensor__data = not bool(data[2])
-                else:
-                    self._Sensor__data = bool(data[2])
-                if Sensor.is_ready(self) and self._Sensor__callback is not None:
-                    if is_async_function(self._Sensor__callback):
-                        await self._Sensor__callback(self)
+            if Sensor.is_ready(self):
+
+                # Check if the button is inverted
+                self.__data = not bool(data[2]) if self.invert else bool(data[2])
+
+                # Check if the user has defined a callback function
+                if self.__callback is not None:
+
+                    # Check if the callback function is async
+                    if is_async_function(self.__callback):
+                        await self.__callback(self)
                     else:
-                        self._Sensor__callback(self)
+                        self.__callback(self)
+                        
         except Exception as e:
             print(e)

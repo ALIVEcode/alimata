@@ -11,10 +11,12 @@ class Board:
     ----------
     board_id : int
         The id of the board same as in firmata (read only)
-    start : function
+
+    
+    Methods
+    ---------
+    start(setup_func, loop_func)
         Starting the board : (setup_func, loop_func)
-    shutdown : function
-        Shutdown the board
     is_started : bool
         Retuns if the board is started or not (read only)
     pymata_board : pymata_express
@@ -67,7 +69,6 @@ class Board:
                 self.shutdown()
                 sys.exit(0)
 
-    @property
     def is_started(self):
         return self.__is_started
     

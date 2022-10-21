@@ -18,7 +18,6 @@ button = Button(board, pin, callback=callback_function, invert=True)
 #Main function
 async def setup():
     print("Starting main")
-    print(dir(button))
 
 async def loop():
     # print(button.value)

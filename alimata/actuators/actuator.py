@@ -26,9 +26,6 @@ class Actuator(ABC):
         self.__max_pulse = max_pulse
         self.__step_per_revolution = step_per_revolution
 
-        # TO ACCESS THIS ATTRIBUTE FROM A CHILD CLASS
-        # USE THE FOLLOWING SYNTAX: self._Actuator__data
-        self.__data = None
 
         # set the event loop
         self.loop = asyncio.get_event_loop()

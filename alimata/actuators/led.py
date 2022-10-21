@@ -28,9 +28,7 @@ class Led(Actuator):
         Actuator.__init__(self, board=board, pin=pin, type=PIN_MODE.PWM)
 
         # Initialises the led to off
-        # TO ACCESS THE PRIVATE VARIABLE from the parent class
-        # USE THE FOLLOWING SYNTAX: self._Actuator__data
-        self._Actuator__data = False
+        self.__data = False
 
         # Initialises the intensity to 255
         self.__intensity = 255
@@ -40,7 +38,7 @@ class Led(Actuator):
         """
         Toggle the led on or off \n
         """
-        if self._Actuator__data:
+        if self.__data:
             self.off(self)
         else:
             self.on(self)
@@ -50,7 +48,7 @@ class Led(Actuator):
         """
         Turn the led on \n
         """
-        self._Actuator__data = True # Set the status of the led to on
+        self.__data = True # Set the status of the led to on
         self.board.write_to_pin(self.pin, WRITE_MODE.PWM, self.__intensity) # Set the intensity of the led
         # await self.board.write_to_pin(self.pin, WRITE_MODE.PWM, 255)
     
@@ -58,7 +56,7 @@ class Led(Actuator):
         """
         Turn the led off \n
         """
-        self._Actuator__data = False # Set the status of the led to off
+        self.__data = False # Set the status of the led to off
         self.board.write_to_pin(self.pin, WRITE_MODE.PWM, 0)
 
 
@@ -83,7 +81,7 @@ class Led(Actuator):
         """
         Get or Set the current status of the led [True/False]\n
         """
-        return self._Actuator__data
+        return self.__data
     
 
     @data.setter
