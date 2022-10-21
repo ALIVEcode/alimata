@@ -27,36 +27,43 @@ class DHT(Sensor):
 
     def __init__(self, board: Board, pin: str, callback=None):
 
-        Sensor.__init__(self, board=board, pin=pin, callback=callback, type=PIN_MODE.DHT, sensor_type=DHT_SENSOR_TYPE.DHT11)
+        Sensor.__init__(self, board=board, pin=pin, type=PIN_MODE.DHT, sensor_type=DHT_SENSOR_TYPE.DHT11)
+
+
+        # self.__data is a tuple of (humidity, temperature)
+        self.__data = None 
+
+        # Initialises the Callback function that is *user defined*
+        self.__callback = callback
 
 
     @property
     def data(self):
-        """Return the Temperature and Humidity ( [ humidity, temperature] )"""
-        return self._Sensor__data
+        """Return the Temperature and Humidity (humidity, temperature)"""
+        return self.__data
 
     @property
-    def temperature(self):
+    def temperature(self) -> float:
         """Return the Temperature in Celsius (float)"""
-        return self._Sensor__data[1]
+        return self.__data[1]
     
     @property
     def humidity(self): 
         """Return the Humidity in % (float)"""
-        return self._Sensor__data[0]
+        return self.__data[0]
 
     
 
 
-    async def _Sensor__is_changed_callback(self, data):
+    # Back end callback function (*not user defined*)
+    async def is_changed_callback(self, data):
         """Callback when the sensor's data has changed enough"""
         try:
-            if self.board.is_started:
-                self._Sensor__data = [data[4], data[5]]
-                if Sensor.is_ready(self) and self._Sensor__callback is not None:
-                    if is_async_function(self._Sensor__callback):
-                        await self._Sensor__callback(self)
-                    else:
-                        self._Sensor__callback(self)
+            self.__data = (data[4], data[5])
+            if Sensor.is_ready(self) and self.__callback is not None:
+                if is_async_function(self.__callback):
+                    await self.__callback(self)
+                else:
+                    self.__callback(self)
         except Exception as e:
             print(e)

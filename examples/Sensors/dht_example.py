@@ -25,7 +25,7 @@ async def setup():
 
 async def loop():
     if dht.is_ready():
-        temp = dht.data
+        temp = dht.temperature
         hum = dht.humidity
         print("Temp : " + str(temp) + " | Humidity : " + str(hum))
 
