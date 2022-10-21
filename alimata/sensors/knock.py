@@ -9,35 +9,39 @@ class Knock(Sensor):
     
     Attributes
     ----------
-    data : bool
-        the value of the Knock Sensor (True or False)
-    invert : bool
-        if the sensor is inverted or not
+    data : Int
+        the value of the Knock Sensor (0-1023)
     pin : str
         the pin of the Knock Sensor
     """
 
-    def __init__(self, board: Board, pin, invert: bool = False, callback=None):
+    def __init__(self, board: Board, pin, callback=None):
         
         Sensor.__init__(self, board=board, pin=pin, callback=callback, type=PIN_MODE.PULLUP)
 
-        self.invert = invert
+        self.__treshold = 0
+
     
     @property
     def data(self):
         """Return the current status of the knock sensor (True or False)"""
         return self._Sensor__data
 
+    @proprety
+    def treshold(self):
+        return self.__treshold
+
+    @treshold.setter
+    def setTreshold(self, treshold: int):
+        self.__treshold = treshold
+        self.board.write_to_pin(self.pin, PIN_MODE.PWM, treshold)
+
     # Change the status of the sensor is knock
     async def _Sensor__is_changed_callback(self, data):
         """Callback when the knock sensor value has changed"""
         try:
             if self.board.is_started:
-                if self.invert:
-                    self._Sensor__data = not bool(data[2])
-                else:
-                    self._Sensor__data = bool(data[2])
-                
+                self._Sensor__data = data
                 if Sensor.is_ready(self) and self._Sensor__callback is not None:
                     if is_async_function(self._Sensor__callback):
                         await self._Sensor__callback(self)
