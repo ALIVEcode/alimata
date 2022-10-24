@@ -40,7 +40,7 @@ class Actuator(ABC):
     async def async_init(self):
         await self.board.set_pin_mode(
             pin=self.pin,
-            type=self.__type,
+            type_=self.__type,
             min_pulse=self.__min_pulse,
             max_pulse=self.__max_pulse,
             step_per_revolution=self.__step_per_revolution)

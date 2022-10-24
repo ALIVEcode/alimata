@@ -31,8 +31,8 @@ buttonPin = 2
 buttonPin2 = 6
 ledPin = 3
 
-button2 = Button(board, 2, callback=callback_function, invert=True)
-button = Button(board, 6, callback=callback2, invert=True)
+button2 = Button(board, 2, on_change=callback_function, invert=True)
+button = Button(board, 6, on_change=callback2, invert=True)
 led = Led(board, ledPin)
 
 
@@ -43,6 +43,7 @@ async def setup():
 
 async def loop():
     await sleep(1)
+    # print(button.data)
 
 
 board.start(setup, loop)

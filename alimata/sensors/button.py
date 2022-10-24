@@ -1,6 +1,7 @@
 from alimata.core.core import is_async_function, PIN_MODE
 from alimata.sensors.sensor import Sensor
 from alimata.core.board import Board
+from typing import Callable
 
 
 class Button(Sensor):
@@ -21,47 +22,29 @@ class Button(Sensor):
     """
 
 
-    # Instead of using self.__data, we use self._Sensor__data
 
-    def __init__(self, board: Board, pin: str, invert: bool = False, callback=None):
+    def __init__(self, board: Board, pin: str, invert: bool = False, on_change: Callable[[list[float | int]], None] | None = None):
         
-        Sensor.__init__(self, board=board, pin=pin, type=PIN_MODE.PULLUP)
 
         # Initialises the button as not pressed
-        self.__data = False # PRIVATE
-
-        # Initialises the Callback function that is *user defined*
-        self.__callback = callback # PRIVATE
+        self.__state = False # PRIVATE
 
         # Initialises the invert value
         self.invert = invert # PUBLIC
 
+        super().__init__(board=board, pin=pin, type_=PIN_MODE.PULLUP, on_change=on_change)
+
+
 
     # ABSTRACT FROM SENSOR
     @property
-    def data(self):
+    def data(self) -> bool:
         """Return the current status of the button (True or False)"""
-        return self.__data
+        return self.__state
 
 
     # ABSTRACT FROM SENSOR
     # Change the status of the button when pressed
     # Back end callback function (*not user defined*)
-    async def is_changed_callback(self, data):
-        try:
-            if Sensor.is_ready(self):
-
-                # Check if the button is inverted
-                self.__data = not bool(data[2]) if self.invert else bool(data[2])
-
-                # Check if the user has defined a callback function
-                if self.__callback is not None:
-
-                    # Check if the callback function is async
-                    if is_async_function(self.__callback):
-                        await self.__callback(self)
-                    else:
-                        self.__callback(self)
-                        
-        except Exception as e:
-            print(e)
+    async def _update_data(self, data: list):
+        self.__state = not data[2] if self.invert else data[2] == 1

@@ -17,7 +17,7 @@ class Knock(Sensor):
 
     def __init__(self, board: Board, pin, callback=None):
         
-        Sensor.__init__(self, board=board, pin=pin, callback=callback, type=PIN_MODE.PULLUP)
+        Sensor.__init__(self, board=board, pin=pin, callback=callback, type_=PIN_MODE.PULLUP)
 
         self.__treshold = 0
 

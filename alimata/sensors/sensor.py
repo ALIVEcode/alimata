@@ -1,8 +1,10 @@
 from alimata.core.board import Board
-from alimata.core.core import DHT_SENSOR_TYPE, PIN_MODE
+from typing import Callable, Optional
 
 import asyncio
 from abc import ABC, abstractmethod, abstractproperty
+
+from alimata.core.core import is_async_function
 
 
 class Sensor(ABC):
@@ -25,25 +27,27 @@ class Sensor(ABC):
 
     # Constructor of the class Sensor
     def __init__(self, 
-    pin: str, 
-    board: Board,
-    type: str, 
-    differential: int = 1, # Facultative
-    echo_pin: str = None, # Facultative
-    timeout: int = 8000, # Facultative
-    sensor_type: int = 11 # Facultative
-    ):
+                pin: str, 
+                board: Board,
+                type_: str, 
+                differential: int = 1, # Facultative
+                echo_pin: str = None, # Facultative
+                timeout: int = 8000, # Facultative
+                sensor_type: int = 11, # Facultative
+                on_change: Optional[Callable[[list], None]] = None
+                ):
 
         # Create Public Attributes
         self.board = board
         self.pin = pin
 
         # Create Private Attributes
-        self.__type = type
+        self.__type = type_
         self.__differential = differential
         self.__echo_pin = echo_pin
         self.__timeout = timeout
         self.__sensor_type = sensor_type
+        self.__on_change: Optional[Callable[[list], None]] = on_change
 
 
         # set the event loop
@@ -58,31 +62,46 @@ class Sensor(ABC):
     async def async_init(self):
         await self.board.set_pin_mode(
             pin=self.pin,
-            type=self.__type,
-            callback=self.is_changed_callback,
+            type_=self.__type,
+            callback=self.__callback,
             differential=self.__differential,
             echo_pin=self.__echo_pin,
             timeout=self.__timeout,
             sensor_type=self.__sensor_type)
     
+    def on_change(self, on_change: Callable[[list], None]):
+        """Set the callback when the sensor value has changed"""
+        self.__on_change = on_change
+
+    async def __callback(self, data: list):
+        try:
+            await self._update_data(data)
+
+            if not self.is_ready() or self.__on_change is None:
+                return
+
+            if is_async_function(self.__on_change):
+                await self.__on_change(self)
+            else:
+                self.__on_change(self)
+        except Exception as e:
+            print(e)
+
     @abstractmethod
-    async def is_changed_callback(self, data):
+    async def _update_data(self, data):
         """Callback when the sensor's value has changed enough"""
         pass
 
 
     def is_ready(self) -> bool:
         """Return True if the sensor is ready to read (True or False)"""
-        if self.data == None: # self.data is a property of the child class
+        if self.data is None:  # self.data is a property of the child class
             return False
-        else:
-            if self.board.is_started():
-                return True
-            else:
-                return False
+        return self.board.is_started()
         
     
-    @abstractproperty
+    @property
+    @abstractmethod
     def data(self):
         """Return the data of the sensor"""
         pass

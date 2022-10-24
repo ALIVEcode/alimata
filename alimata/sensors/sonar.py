@@ -18,7 +18,7 @@ class Sonar(Sensor):
 
     def __init__(self, board: Board.board, trigger_pin, echo_pin, callback=None, timeout=8000):
 
-        Sensor.__init__(self, board=board, pin=trigger_pin, callback=callback, type=PIN_MODE.SONAR, echo_pin=echo_pin, timeout=timeout)
+        super().__init__(board=board, pin=trigger_pin, callback=callback, type_=PIN_MODE.SONAR, echo_pin=echo_pin, timeout=timeout)
 
     @property
     def data(self):

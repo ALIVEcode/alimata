@@ -98,40 +98,39 @@ class Board:
         return int(pin)
 
 
-    async def set_pin_mode(self, pin: str | int, type: PIN_MODE, callback=None, differential: int = 1, echo_pin: str | int = None, timeout: int = 8000,
-                           sensor_type: DHT_SENSOR_TYPE = None, min_pulse: int = 544, max_pulse:int =2400, step_per_revolution: int = None):
-        pin = self.parse_pin_number(pin, type)
+    async def set_pin_mode(self, pin: str | int, type_: PIN_MODE, callback=None, differential: int = 1, echo_pin: str | int = None, timeout: int = 8000, sensor_type: DHT_SENSOR_TYPE = None, min_pulse: int = 544, max_pulse:int =2400, step_per_revolution: int = None):
+        pin = self.parse_pin_number(pin, type_)
         
-        if type == PIN_MODE.INPUT:
+        if type_ == PIN_MODE.INPUT:
             await self.__board.set_pin_mode_digital_input(pin, callback)
-        elif type == PIN_MODE.OUTPUT:
+        elif type_ == PIN_MODE.OUTPUT:
             await self.__board.set_pin_mode_digital_output(pin)
-        elif type == PIN_MODE.PULLUP:
+        elif type_ == PIN_MODE.PULLUP:
             await self.__board.set_pin_mode_digital_input_pullup(pin, callback)
-        elif type == PIN_MODE.ANALOG:
+        elif type_ == PIN_MODE.ANALOG:
             await self.__board.set_pin_mode_analog_input(pin, callback, differential)
-        elif type == PIN_MODE.PWM:
+        elif type_ == PIN_MODE.PWM:
             await self.__board.set_pin_mode_pwm_output(pin)
-        elif type == PIN_MODE.SONAR:
+        elif type_ == PIN_MODE.SONAR:
             if echo_pin is None:
                 raise TypeError("echo_pin is required to setup a sonar")
             else:
                 await self.__board.set_pin_mode_sonar(pin, echo_pin, callback, timeout)
-        elif type == PIN_MODE.DHT:
+        elif type_ == PIN_MODE.DHT:
             if sensor_type is None:
                 raise TypeError("sensor_type is required to setup a DHT sensor")
             else:
                 await self.__board.set_pin_mode_dht(pin, sensor_type, differential, callback)
-        elif type == PIN_MODE.SERVO:
+        elif type_ == PIN_MODE.SERVO:
             await self.__board.set_pin_mode_servo(pin, min_pulse, max_pulse)
-        elif type == PIN_MODE.STEPPER:
+        elif type_ == PIN_MODE.STEPPER:
             if step_per_revolution is None:
                 raise TypeError("step_per_revolution is required to setup a stepper motor")
             elif len(pin) != 2 or len(pin) != 4:
                 raise TypeError("pin must be a list of 2 or 4 pins")
             else:
                 await self.__board.set_pin_mode_stepper(step_per_revolution, pin)
-        elif type == PIN_MODE.TONE:
+        elif type_ == PIN_MODE.TONE:
             await self.__board.set_pin_mode_tone(pin)
         else:
             raise TypeError("type must be INPUT, OUTPUT, PULLUP, ANALOG, PWM or SONAR")
