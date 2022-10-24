@@ -1,3 +1,4 @@
+from typing import Optional
 from alimata.core.board import Board
 from alimata.core.core import PIN_MODE, WRITE_MODE
 
@@ -8,12 +9,12 @@ class Actuator(ABC):
 
    # Constructor of the class Actuator
     def __init__(self, 
-    pin: str, 
+    pin: str | int, 
     board: Board,
-    type: str,
+    type_: PIN_MODE,
     min_pulse: int = 544,
     max_pulse: int = 2400,
-    step_per_revolution: int = None
+    step_per_revolution: int = 1
     ):
 
         # Create Public Attributes
@@ -21,7 +22,7 @@ class Actuator(ABC):
         self.pin = pin
 
         # Create Private Attributes
-        self.__type = type
+        self.__type = type_
         self.__min_pulse = min_pulse
         self.__max_pulse = max_pulse
         self.__step_per_revolution = step_per_revolution

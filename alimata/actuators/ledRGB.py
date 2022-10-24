@@ -53,9 +53,9 @@ class LedRGB(Actuator):
         Toggle the led on or off \n
         """
         if self._Actuator__data:
-            self.off(self)
+            self.off()
         else:
-            self.on(self)
+            self.on()
 
     def on(self):
         """

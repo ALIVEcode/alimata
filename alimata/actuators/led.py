@@ -25,7 +25,7 @@ class Led(Actuator):
         Turn the led off
     """
     def __init__(self, board: Board, pin):
-        Actuator.__init__(self, board=board, pin=pin, type=PIN_MODE.PWM)
+        super().__init__(board=board, pin=pin, type_=PIN_MODE.PWM)
 
         # Initialises the led to off
         self.__data = False
@@ -39,9 +39,9 @@ class Led(Actuator):
         Toggle the led on or off \n
         """
         if self.__data:
-            self.off(self)
+            self.off()
         else:
-            self.on(self)
+            self.on()
 
     
     def on(self):
