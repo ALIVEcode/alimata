@@ -6,6 +6,7 @@ Alimata is a python library used to simplify the implementation of [pymata-expre
 
 ## Requirements
 
+- python 3.7 or higher
 - pymata-express
 - FirmataExpress
 
