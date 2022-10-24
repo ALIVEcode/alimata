@@ -1,3 +1,4 @@
+import time
 from alimata.core.core import is_async_function, PIN_MODE
 from alimata.core.board import Board
 from alimata.sensors.sensor import Sensor
@@ -16,21 +17,28 @@ class Knock(Sensor):
         the pin of the Knock Sensor
     """
 
-    def __init__(self, board: Board, pin: str, on_change: Callable[[list[float | int]], None] | None = None):
+    def __init__(self, board: Board, pin: str, treshold: int = 10 ,on_change: Callable[[list[float | int]], None] | None = None):
         
-        self.__state = False
+        self.__value = 0
+        self.__is_knocked = False
+        self.__treshold = 0
+        self.__last_knocked = time.time()
         super().__init__(board=board, pin=pin, on_change=on_change, type_=PIN_MODE.ANALOG)
 
     
+
+
     @property
     def data(self):
         """Return the current status of the knock sensor (True or False)"""
-        return self.__state
+        return self.__value
 
     # Change the status of the sensor is knock
-    async def _update_data(self, data: list):
+    async def _update_data(self, py_data: list):
         """Callback when the knock sensor value has changed"""
-        self.__state= bool(data[2])
-        
-
+        print(time.time() - self.__last_knocked)
+        if py_data[2] >= self.__treshold and (time.time() - self.__last_knocked) * 1000 > 100:
+            self.__is_knocked = True
+            self.__last_knocked = time.time()
+            self.__value = py_data[2]
 
