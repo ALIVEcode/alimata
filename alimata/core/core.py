@@ -10,7 +10,7 @@ def is_async_function(func):
     return asyncio.iscoroutinefunction(func)
 
 
-def maprange(value: int, from_min: int, from_max: int, to_min: int, to_max: int):
+def maprange(value: int | float, from_min: int | float, from_max: int | float, to_min: int | float, to_max: int | float):
     return to_min + ((value - from_min) * (to_max - to_min) / (from_max - to_min))
 
 def print_warning(message: str = ""):
