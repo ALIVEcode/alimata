@@ -37,8 +37,6 @@ class Board:
         self.__board = telemetrix.Telemetrix(arduino_instance_id=board_id, com_port=COM_port, arduino_wait=2)
         self.__board_id = board_id
         self.__is_started = False
-        #self.__num_of_digital_pins = len(self.__board.digital_pins)
-        #self.__num_of_analog_pins = len(self.__board.analog_pins)
 
     def __main(self):
         # start the setup function
@@ -84,15 +82,17 @@ class Board:
 
     
     # Converting the analog pin value to the correct one depending on the board and function used
-    def parse_pin_number(self, pin: Union[str, int]) -> int:
+    def parse_pin_number(self, pin: Union[str, int], type_) -> int:
         if type(pin) == str:
             if pin.startswith("A"): #Check if it's an analog pin
+                if type_ != PIN_MODE.ANALOG_INPUT or type_ != PIN_MODE.ANALOG_OUTPUT or type_ != WRITE_MODE.ANALOG:
+                    raise AlimataUnexpectedPin("Can't assign a analog pin to a digital function")
                 pin = pin[1:]
         return int(pin)
 
 
     def set_pin_mode(self, pin: Union[str, int], type_: PIN_MODE, callback=None, differential: int = 1, echo_pin: Union[str, int] = None, min_pulse: int = 544, max_pulse:int =2400):
-        pin = self.parse_pin_number(pin)
+        pin = self.parse_pin_number(pin, type_)
         
         if type_ == PIN_MODE.DIGITAL_INPUT:
             self.__board.set_pin_mode_digital_input(pin, callback)
@@ -120,8 +120,8 @@ class Board:
 
         
     # Use PWM for analog write
-    def write_to_pin(self, pin: Union[str, int], type: WRITE_MODE, value: int):
-        pin = self.parse_pin_number(pin)
+    def write_to_pin(self, pin: Union[str, int], type_: WRITE_MODE, value: int):
+        pin = self.parse_pin_number(pin, type_)
 
         if type == WRITE_MODE.ANALOG:
             if value >= 0 or value <= 255:
