@@ -79,22 +79,20 @@ class Board:
     def shutdown(self):
         self.__is_started = False
 
-        print("SHUTING DOWN BOARD ! | ID : " + str(self.__board_id) + " | TIME : " + str(datetime.datetime.now().strftime("%H:%M:%S")))
+        print("\nSHUTING DOWN BOARD ! | ID : " + str(self.__board_id) + " | TIME : " + str(datetime.datetime.now().strftime("%H:%M:%S")))
         self.__board.shutdown()
 
     
     # Converting the analog pin value to the correct one depending on the board and function used
-    def parse_pin_number(self, pin: Union[str, int], pin_type) -> int:
+    def parse_pin_number(self, pin: Union[str, int]) -> int:
         if type(pin) == str:
             if pin.startswith("A"): #Check if it's an analog pin
                 pin = pin[1:]
-                if pin_type != "ANALOG":
-                    pin = int(pin) + self.__num_of_digital_pins
         return int(pin)
 
 
     def set_pin_mode(self, pin: Union[str, int], type_: PIN_MODE, callback=None, differential: int = 1, echo_pin: Union[str, int] = None, min_pulse: int = 544, max_pulse:int =2400):
-        #pin = self.parse_pin_number(pin, type_)
+        pin = self.parse_pin_number(pin)
         
         if type_ == PIN_MODE.DIGITAL_INPUT:
             self.__board.set_pin_mode_digital_input(pin, callback)
@@ -123,7 +121,7 @@ class Board:
         
     # Use PWM for analog write
     def write_to_pin(self, pin: Union[str, int], type: WRITE_MODE, value: int):
-        #pin = self.parse_pin_number(pin, type)
+        pin = self.parse_pin_number(pin)
 
         if type == WRITE_MODE.ANALOG:
             if value >= 0 or value <= 255:
