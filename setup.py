@@ -29,6 +29,6 @@ if __name__ == "__main__":
               include=['alimata', 'alimata.*']),
           include_package_data=True,
           python_requires=">=3.7",
-          install_requires=["pymata-express>=2.0.0"],
+          install_requires=["telemetrix>=1.10.0"],
           setup_requires="setuptools",
           )

@@ -19,11 +19,11 @@ dht = DHT(board, dhtPin)
 
 
 #Main function
-async def setup():
+def setup():
     print("Starting main")
 
 
-async def loop():
+def loop():
     if dht.is_ready():
         temp = dht.temperature
         hum = dht.humidity
@@ -31,6 +31,6 @@ async def loop():
 
 
 
-    await sleep(1)
+    sleep(1)
 
 board.start(setup, loop)

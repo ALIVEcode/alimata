@@ -1,9 +1,9 @@
 from alimata.sensors.button import Button
 from alimata.core.board import Board
-from asyncio import sleep
+from time import sleep
 
 #Defining the pin of the button sensor (the other pin is connected to ground or 5v)
-pin = 2
+pin = 3
 
 #Creating a new board
 board = Board()
@@ -16,13 +16,13 @@ def callback_function(data):
 button = Button(board, pin, on_change=callback_function, invert=True)
 
 #Main function
-async def setup():
+def setup():
     print("Starting main")
 
-async def loop():
+def loop():
     # print(button.value)
     print(button.data)
-    await sleep(1)
+    sleep(1)
 
 
 board.start(setup, loop)

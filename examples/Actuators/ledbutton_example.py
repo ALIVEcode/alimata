@@ -1,7 +1,7 @@
 from alimata.sensors.button import Button
 from alimata.actuators.led import Led
 from alimata.core.board import Board
-from asyncio import sleep, all_tasks
+from time import sleep
 
 
 #Creating a new board
@@ -37,12 +37,12 @@ led = Led(board, ledPin)
 
 
 #Main function
-async def setup():
+def setup():
     print("Starting main")
 
 
-async def loop():
-    await sleep(1)
+def loop():
+    sleep(1)
     # print(button.data)
 
 

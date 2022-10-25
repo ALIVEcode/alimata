@@ -25,7 +25,7 @@ class Led(Actuator):
         Turn the led off
     """
     def __init__(self, board: Board, pin):
-        super().__init__(board=board, pin=pin, type_=PIN_MODE.PWM)
+        super().__init__(board=board, pin=pin, type_=PIN_MODE.ANALOG_OUTPUT)
 
         # Initialises the led to off
         self.__data = False
@@ -49,7 +49,7 @@ class Led(Actuator):
         Turn the led on \n
         """
         self.__data = True # Set the status of the led to on
-        self.board.write_to_pin(self.pin, WRITE_MODE.PWM, self.__intensity) # Set the intensity of the led
+        self.board.write_to_pin(self.pin, WRITE_MODE.ANALOG, self.__intensity) # Set the intensity of the led
         # await self.board.write_to_pin(self.pin, WRITE_MODE.PWM, 255)
     
     def off(self):
@@ -57,7 +57,7 @@ class Led(Actuator):
         Turn the led off \n
         """
         self.__data = False # Set the status of the led to off
-        self.board.write_to_pin(self.pin, WRITE_MODE.PWM, 0)
+        self.board.write_to_pin(self.pin, WRITE_MODE.ANALOG, 0)
 
 
 
@@ -72,7 +72,7 @@ class Led(Actuator):
     @intensity.setter
     def intensity(self, intensity: int):
         self.__intensity = intensity
-        self.board.write_to_pin(self.pin, WRITE_MODE.PWM, intensity)
+        self.board.write_to_pin(self.pin, WRITE_MODE.ANALOG, intensity)
 
   
 

@@ -1,6 +1,6 @@
 from alimata.sensors.sonar import Sonar
 from alimata.core.board import Board
-import asyncio
+from time import sleep
 
 # Defining the pins of the HC-SR04 sonar
 triger_pin = 10
@@ -14,13 +14,13 @@ sonar = Sonar(board, triger_pin, echo_pin)
 
 
 # Main function
-async def setup():
+def setup():
     print("Starting main")
 
 
-async def loop():
+def loop():
     print(sonar.get_distance())
-    await asyncio.sleep(1)
+    sleep(1)
 
 
 board.start(setup, loop)

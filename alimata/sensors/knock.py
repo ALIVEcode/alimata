@@ -1,5 +1,5 @@
 import time
-from alimata.core.core import is_async_function, PIN_MODE
+from alimata.core.core import PIN_MODE
 from alimata.core.board import Board
 from alimata.sensors.sensor import Sensor
 from typing import Callable
@@ -23,7 +23,7 @@ class Knock(Sensor):
         self.__is_knocked = False
         self.__treshold = 0
         self.__last_knocked = time.time()
-        super().__init__(board=board, pin=pin, on_change=on_change, type_=PIN_MODE.ANALOG)
+        super().__init__(board=board, pin=pin, on_change=on_change, type_=PIN_MODE.ANALOG_INPUT)
 
     
 

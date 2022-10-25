@@ -1,7 +1,7 @@
-from alimata.core.core import is_async_function, PIN_MODE
+from alimata.core.core import PIN_MODE
 from alimata.sensors.sensor import Sensor
 from alimata.core.board import Board
-from typing import Callable
+from typing import Callable, Union, List
 
 
 class Button(Sensor):
@@ -23,7 +23,7 @@ class Button(Sensor):
 
 
 
-    def __init__(self, board: Board, pin: str, invert: bool = False, on_change: Callable[[list[float | int]], None] | None = None):
+    def __init__(self, board: Board, pin: str, invert: bool = False, on_change: Union[Callable[[List[Union[float, int]]], None], None ]= None):
         
 
         # Initialises the button as not pressed
@@ -46,5 +46,5 @@ class Button(Sensor):
     # ABSTRACT FROM SENSOR
     # Change the status of the button when pressed
     # Back end callback function (*not user defined*)
-    async def _update_data(self, data: list):
+    def _update_data(self, data: list):
         self.__state = not data[2] if self.invert else data[2] == 1

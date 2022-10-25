@@ -2,7 +2,6 @@ from alimata.actuators.led import Led
 from alimata.core.board import Board
 from alimata.core.core import WRITE_MODE
 from alimata.actuators.actuator import Actuator
-import asyncio
 
 class LedRGB(Actuator):
     """

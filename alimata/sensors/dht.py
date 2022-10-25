@@ -1,4 +1,4 @@
-from alimata.core.core import DHT_SENSOR_TYPE, is_async_function, PIN_MODE
+from alimata.core.core import DHT_SENSOR_TYPE, PIN_MODE
 from alimata.sensors.sensor import Sensor
 from alimata.core.board import Board
 
@@ -27,7 +27,7 @@ class DHT(Sensor):
 
     def __init__(self, board: Board, pin: str, callback=None):
 
-        Sensor.__init__(self, board=board, pin=pin, type_=PIN_MODE.DHT, sensor_type=DHT_SENSOR_TYPE.DHT11)
+        Sensor.__init__(self, board=board, pin=pin, type_=PIN_MODE.DHT)
 
 
         # self.__data is a tuple of (humidity, temperature)
@@ -61,9 +61,6 @@ class DHT(Sensor):
         try:
             self.__data = (data[4], data[5])
             if Sensor.is_ready(self) and self.__callback is not None:
-                if is_async_function(self.__callback):
-                    await self.__callback(self)
-                else:
-                    self.__callback(self)
+                self.__callback(self)
         except Exception as e:
             print(e)
