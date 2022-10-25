@@ -13,7 +13,7 @@ def callback_function(data):
     print("pressed" + str(data.data))
 
 #Creating a new button object
-button = Button(board, pin, callback=callback_function, invert=True)
+button = Button(board, pin, on_change=callback_function, invert=True)
 
 #Main function
 async def setup():

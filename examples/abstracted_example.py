@@ -13,7 +13,7 @@ async def callback_function(data):
 
 # Creating a new buttons object
 button1 = Button(board, 2)
-button2 = Button(board, 3, callback=callback_function)
+button2 = Button(board, 3, on_change=callback_function)
 
 
 # Setup function

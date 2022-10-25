@@ -27,7 +27,7 @@ class DHT(Sensor):
 
     def __init__(self, board: Board, pin: str, callback=None):
 
-        Sensor.__init__(self, board=board, pin=pin, type=PIN_MODE.DHT, sensor_type=DHT_SENSOR_TYPE.DHT11)
+        Sensor.__init__(self, board=board, pin=pin, type_=PIN_MODE.DHT, sensor_type=DHT_SENSOR_TYPE.DHT11)
 
 
         # self.__data is a tuple of (humidity, temperature)
@@ -56,7 +56,7 @@ class DHT(Sensor):
 
 
     # Back end callback function (*not user defined*)
-    async def is_changed_callback(self, data):
+    async def _update_data(self, data):
         """Callback when the sensor's data has changed enough"""
         try:
             self.__data = (data[4], data[5])

@@ -1,6 +1,8 @@
+import time
 from alimata.core.core import is_async_function, PIN_MODE
 from alimata.core.board import Board
 from alimata.sensors.sensor import Sensor
+from typing import Callable
 
 
 class Knock(Sensor):
@@ -15,39 +17,28 @@ class Knock(Sensor):
         the pin of the Knock Sensor
     """
 
-    def __init__(self, board: Board, pin, callback=None):
+    def __init__(self, board: Board, pin: str, treshold: int = 10 ,on_change: Callable[[list[float | int]], None] | None = None):
         
-        Sensor.__init__(self, board=board, pin=pin, callback=callback, type=PIN_MODE.PULLUP)
-
+        self.__value = 0
+        self.__is_knocked = False
         self.__treshold = 0
+        self.__last_knocked = time.time()
+        super().__init__(board=board, pin=pin, on_change=on_change, type_=PIN_MODE.ANALOG)
 
     
+
+
     @property
     def data(self):
         """Return the current status of the knock sensor (True or False)"""
-        return self._Sensor__data
-
-    @proprety
-    def treshold(self):
-        return self.__treshold
-
-    @treshold.setter
-    def setTreshold(self, treshold: int):
-        self.__treshold = treshold
-        self.board.write_to_pin(self.pin, PIN_MODE.PWM, treshold)
+        return self.__value
 
     # Change the status of the sensor is knock
-    async def _Sensor__is_changed_callback(self, data):
+    async def _update_data(self, py_data: list):
         """Callback when the knock sensor value has changed"""
-        try:
-            if self.board.is_started:
-                self._Sensor__data = data
-                if Sensor.is_ready(self) and self._Sensor__callback is not None:
-                    if is_async_function(self._Sensor__callback):
-                        await self._Sensor__callback(self)
-                    else:
-                        self._Sensor__callback(self)
-        except Exception as e:
-            print(e)
-
+        print(time.time() - self.__last_knocked)
+        if py_data[2] >= self.__treshold and (time.time() - self.__last_knocked) * 1000 > 100:
+            self.__is_knocked = True
+            self.__last_knocked = time.time()
+            self.__value = py_data[2]
 
