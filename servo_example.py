@@ -10,7 +10,7 @@ board = Board()
 servo_pin = 3
 
 # Create a servo object
-servo = Servo(board=board, pin=servo_pin)
+servo = Servo(board=board, pin_=servo_pin)
 
 #Main function
 async def setup():
