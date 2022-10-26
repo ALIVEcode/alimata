@@ -13,7 +13,7 @@ class Board:
     Attributes
     ----------
     board_id : int
-        The id of the board same as in firmata (read only)
+        The id of the board same as in telemetrix4arduino (read only)
 
     
     Methods
@@ -22,10 +22,10 @@ class Board:
         Starting the board : (setup_func, loop_func)
     is_started : bool
         Retuns if the board is started or not (read only)
-    pymata_board : pymata_express
-        The pymata_express board object (read only)
+    telemetrix_board : telemetrix
+        The telemetrix board object (read only)
     set_pin_mode : function
-        Setting the pin mode : (pin, type, callback=None, differential=1, echo_pin=None, timeout=8000, sensor_type=None, min_pulse=544, max_pulse=2400, step_per_revolution=None)
+        Setting the pin mode : (pin, type, callback=None, differential=1, echo_pin=None, min_pulse=544, max_pulse=2400)
     write_pin : function
         Writing to a pin : (pin, type, value, duration, step)
     parse_pin_number : function
@@ -37,6 +37,9 @@ class Board:
         self.__board = telemetrix.Telemetrix(arduino_instance_id=board_id, com_port=COM_port, arduino_wait=2)
         self.__board_id = board_id
         self.__is_started = False
+
+        self.__setup_func = None
+        self.__loop_func = None
 
     def __main(self):
         # start the setup function

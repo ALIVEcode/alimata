@@ -3,10 +3,11 @@ from alimata.actuators.actuator import Actuator
 from alimata.core.board import Board
 from alimata.core.core import PIN_MODE, WRITE_MODE, maprange, print_warning
 import time
+from typing import Union, Callable, List
 
 class Servo(Actuator):
 
-    def __init__(self, board: Board,  pin_: str | int, min_pulse: int = 544, max_pulse: int = 2400):
+    def __init__(self, board: Board,  pin_: Union(str, int), min_pulse: int = 544, max_pulse: int = 2400):
         super().__init__(pin=pin_, board=board, type_=PIN_MODE.SERVO, min_pulse=min_pulse, max_pulse=max_pulse)
         self._Actuator__data = 0
         self.__runing = False
@@ -43,7 +44,7 @@ class Servo(Actuator):
             self.__runing = True
             asyncio.create_task(self.__async_move_to(end_angle, duration))
     
-    async def __async_move_to(self, end_angle:int, duration: int):
+    def __async_move_to(self, end_angle:int, duration: int):
         start_angle = self.data
         start_time = time.time()
         while self.__runing:
@@ -56,4 +57,4 @@ class Servo(Actuator):
             else:
                 i = int(maprange(elapsed_time, 0, duration, start_angle, end_angle))
                 self.board.write_to_pin(self.pin, WRITE_MODE.SERVO, i)
-                await asyncio.sleep(0.01)   
+                time.sleep(0.01)   

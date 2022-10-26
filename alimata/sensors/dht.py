@@ -1,6 +1,7 @@
 from alimata.core.core import DHT_SENSOR_TYPE, PIN_MODE
 from alimata.sensors.sensor import Sensor
 from alimata.core.board import Board
+from typing import Callable, Union, List
 
 
 class DHT(Sensor):
@@ -25,16 +26,13 @@ class DHT(Sensor):
         
     """
 
-    def __init__(self, board: Board, pin: str, callback=None):
+    def __init__(self, board: Board, pin: str, on_change: Union[Callable[[List[Union[float, int]]], None], None ]= None):
 
-        Sensor.__init__(self, board=board, pin=pin, type_=PIN_MODE.DHT)
+        super().__init__(board=board, pin=pin, type_=PIN_MODE.DHT, on_change=on_change)
 
 
         # self.__data is a tuple of (humidity, temperature)
         self.__data = None 
-
-        # Initialises the Callback function that is *user defined*
-        self.__callback = callback
 
 
     @property
@@ -56,11 +54,6 @@ class DHT(Sensor):
 
 
     # Back end callback function (*not user defined*)
-    async def _update_data(self, data):
+    def _update_data(self, data):
         """Callback when the sensor's data has changed enough"""
-        try:
-            self.__data = (data[4], data[5])
-            if Sensor.is_ready(self) and self.__callback is not None:
-                self.__callback(self)
-        except Exception as e:
-            print(e)
+        self.__data = (data[4], data[5])

@@ -30,7 +30,6 @@ class Sensor(ABC):
                 type_: str, 
                 differential: int = 1, # Facultative
                 echo_pin: str = None, # Facultative
-                timeout: int = 8000, # Facultative
                 on_change: Optional[Callable[[list], None]] = None
                 ):
 
@@ -64,7 +63,7 @@ class Sensor(ABC):
             if not self.is_ready() or self.__on_change is None:
                 return
 
-            self.__on_change(self)
+            self.__on_change()
         except Exception as e:
             print(e)
 
