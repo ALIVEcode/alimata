@@ -63,6 +63,7 @@ class Sensor(ABC):
             if not self.is_ready() or self.__on_change is None:
                 return
 
+            #call the callback set in the init with the child as the argument
             self.__on_change(self)
         except Exception as e:
             print(e)
