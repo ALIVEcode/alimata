@@ -63,7 +63,7 @@ class Sensor(ABC):
             if not self.is_ready() or self.__on_change is None:
                 return
 
-            self.__on_change()
+            self.__on_change(self)
         except Exception as e:
             print(e)
 
