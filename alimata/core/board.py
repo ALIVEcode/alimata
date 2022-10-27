@@ -126,7 +126,7 @@ class Board:
     def write_to_pin(self, pin: Union[str, int], type_: WRITE_MODE, value: int):
         pin = self.parse_pin_number(pin, type_)
 
-        if type == WRITE_MODE.ANALOG:
+        if type_ == WRITE_MODE.ANALOG:
             if value >= 0 or value <= 255:
                 self.__board.analog_write(pin, value)
             elif value > 255:
@@ -135,12 +135,12 @@ class Board:
             elif value < 0:
                 print_warning("Value is less than 0, setting value to 0")
                 self.__board.analog_write(pin, 0)
-        elif type == WRITE_MODE.DIGITAL:
+        elif type_ == WRITE_MODE.DIGITAL:
             if value not in [0, 1]:
                 raise TypeError("value must be equal to 0 or 1")
             else:
                 self.__board.digital_write(pin, value)
-        elif type == WRITE_MODE.SERVO:
+        elif type_ == WRITE_MODE.SERVO:
             self.__board.servo_write(pin, value)
         else:
             raise TypeError("type must be one of the WRITE_MODE enum")

@@ -1,6 +1,5 @@
 from alimata.core.board import Board
 from alimata.core.core import PIN_MODE, WRITE_MODE
-from types import Union, Callable, List
 
 from abc import ABC, abstractmethod
 
@@ -8,7 +7,7 @@ class Actuator(ABC):
 
    # Constructor of the class Actuator
     def __init__(self, 
-    pin: Union(str, int), 
+    pin: str, 
     board: Board,
     type_: PIN_MODE,
     min_pulse: int = 544,
