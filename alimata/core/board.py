@@ -1,8 +1,7 @@
-import imp
-from alimata.core.core import PIN_MODE, WRITE_MODE, print_warning
+from alimata.core.core import DHT_TYPE, PIN_MODE, WRITE_MODE, print_warning
 from alimata.core.error import AlimataUnexpectedPin
 from telemetrix import telemetrix
-from typing import Union
+from typing import Optional, Union
 import sys, datetime
 
 
@@ -94,7 +93,7 @@ class Board:
         return int(pin)
 
 
-    def set_pin_mode(self, pin: Union[str, int], type_: PIN_MODE, callback=None, differential: int = 1, echo_pin: Union[str, int] = None, min_pulse: int = 544, max_pulse:int =2400):
+    def set_pin_mode(self, pin: Union[str, int], type_: PIN_MODE, callback=None, dht_type: Optional[DHT_TYPE] = None, differential: int = 1, echo_pin: Union[str, int] = None, min_pulse: int = 544, max_pulse:int =2400):
         pin = self.parse_pin_number(pin, type_)
         
         if type_ == PIN_MODE.DIGITAL_INPUT:
@@ -113,7 +112,9 @@ class Board:
             else:
                 self.__board.set_pin_mode_sonar(pin, echo_pin, callback)
         elif type_ == PIN_MODE.DHT:
-            self.__board.set_pin_mode_dht(pin, callback)
+            if dht_type is None:
+                raise TypeError("dht_type is required to setup a dht")
+            self.__board.set_pin_mode_dht(pin, callback, dht_type)
         elif type_ == PIN_MODE.SERVO:
             self.__board.set_pin_mode_servo(pin, min_pulse, max_pulse)
         elif type_ == PIN_MODE.SERVO_DETATCH:

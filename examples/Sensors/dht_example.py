@@ -1,6 +1,7 @@
 from alimata.sensors.dht import DHT
 from alimata.core.board import Board
-from asyncio import sleep
+from alimata.core.core import DHT_TYPE
+from time import sleep
 
 
 #Creating a new board
@@ -14,7 +15,7 @@ def callback_func(obj):
 
 dhtPin = 5
 
-dht = DHT(board, dhtPin)
+dht = DHT(board, dhtPin, DHT_TYPE.DHT11)
 
 
 

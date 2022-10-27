@@ -41,3 +41,7 @@ class WRITE_MODE(str, Enum):
     DIGITAL = "DIGITAL"
     SERVO = "SERVO"
     STEPPER = "STEPPER"
+
+class DHT_TYPE(int, Enum):
+    DHT11 = 11
+    DHT22 = 22

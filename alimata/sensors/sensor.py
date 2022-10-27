@@ -1,5 +1,6 @@
 from alimata.core.board import Board
-from typing import Callable, Optional
+from alimata.core.core import DHT_TYPE
+from typing import Callable, Optional, Union
 
 from abc import ABC, abstractmethod, abstractproperty
 
@@ -28,9 +29,10 @@ class Sensor(ABC):
                 pin: str, 
                 board: Board,
                 type_: str, 
-                differential: int = 1, # Facultative
-                echo_pin: str = None, # Facultative
-                on_change: Optional[Callable[[list], None]] = None
+                dht_type: Optional[DHT_TYPE] = None, # Facultative
+                differential: Optional[int] = None, # Facultative
+                echo_pin: Optional[Union[str, int]] = None, # Facultative
+                on_change: Optional[Callable[[list], None]] = None # Facultative
                 ):
 
         # Create Public Attributes
@@ -39,6 +41,7 @@ class Sensor(ABC):
 
         # Create Private Attributes
         self.__type = type_
+        self.__dht_type = dht_type
         self.__differential = differential
         self.__echo_pin = echo_pin
         self.__on_change: Optional[Callable[[list], None]] = on_change
@@ -47,6 +50,7 @@ class Sensor(ABC):
         self.board.set_pin_mode(
             pin=self.pin,
             type_=self.__type,
+            dht_type=self.__dht_type,
             callback=self.__callback,
             differential=self.__differential,
             echo_pin=self.__echo_pin)

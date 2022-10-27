@@ -1,4 +1,4 @@
-from alimata.core.core import DHT_SENSOR_TYPE, PIN_MODE
+from alimata.core.core import PIN_MODE, DHT_TYPE
 from alimata.sensors.sensor import Sensor
 from alimata.core.board import Board
 from typing import Callable, Union, List
@@ -26,9 +26,9 @@ class DHT(Sensor):
         
     """
 
-    def __init__(self, board: Board, pin: str, on_change: Union[Callable[[List[Union[float, int]]], None], None ]= None):
+    def __init__(self, board: Board, pin: str, dht_type: DHT_TYPE, on_change: Union[Callable[[List[Union[float, int]]], None], None ]= None):
 
-        super().__init__(board=board, pin=pin, type_=PIN_MODE.DHT, on_change=on_change)
+        super().__init__(board=board, pin=pin, type_=PIN_MODE.DHT, dht_type=dht_type, on_change=on_change)
 
 
         # self.__data is a tuple of (humidity, temperature)
