@@ -22,17 +22,18 @@ def loop():
     if servo.runing:
         return
     else:
-        print("Moving to 90")
-        servo.data = 90
-        sleep(1)
-        print("Moving to 0")
-        servo.data = 0
-        sleep(1)
         print("Moving to 180")
-        servo.data = 180
+        servo.move_to(180)
         sleep(1)
-        print("Slowly moving to 0")
-        servo.move_to(0, 2000)
+        print("Moving to 90")
+        servo.move_to(90)
+        sleep(1)
+        print("Moving to 135")
+        servo.move_to(135)
+        sleep(1)
+        print("Moving to 45 in 2 seconds")
+        servo.move_to(45, 2000)
+        sleep(1)
 
 
 board.start(setup, loop)
