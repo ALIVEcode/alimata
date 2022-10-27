@@ -9,8 +9,8 @@ pin = 3
 board = Board()
 
 #Only called when the button is pressed or released
-def callback_function(data):
-    print("pressed" + str(data.data))
+def callback_function(obj):
+    print("pressed" + str(obj.data))
 
 #Creating a new button object
 button = Button(board, pin, on_change=callback_function, invert=True)

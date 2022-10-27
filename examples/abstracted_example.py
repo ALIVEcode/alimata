@@ -7,8 +7,8 @@ board = Board()
 
 
 # Only called when the button2 is pressed or released
-def callback_function(data):
-    print("The value of %d the pin is now %d" % (data[1], data[2]))
+def callback_function(obj):
+    print("The value of %d the pin is now %d" % (obj.data[1], obj.data[2]))
 
 
 # Creating a new buttons object

@@ -7,8 +7,8 @@ from asyncio import sleep
 board = Board()
 
 
-def callback_func(sensor):
-    print("SENSOR UPDATED ! | PIN : " + str(sensor.pin))
+def callback_func(obj):
+    print("SENSOR UPDATED ! | PIN : " + str(obj.pin))
     pass
 
 
