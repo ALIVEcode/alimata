@@ -2,6 +2,7 @@ from alimata.actuators.actuator import Actuator
 from alimata.core.board import Board
 from alimata.core.core import PIN_MODE, WRITE_MODE, maprange, print_warning, normalize_angle
 import time
+from typing import Union
 
 class Servo(Actuator):
     """
@@ -24,7 +25,7 @@ class Servo(Actuator):
         Detatch the servo for reuse
     """
 
-    def __init__(self, board: Board,  pin_: str, min_pulse: int = 544, max_pulse: int = 2400):
+    def __init__(self, board: Board,  pin_: Union[str, int], min_pulse: int = 544, max_pulse: int = 2400):
         super().__init__(pin=pin_, board=board, type_=PIN_MODE.SERVO, min_pulse=min_pulse, max_pulse=max_pulse)
         
         # Initialises the servo to not moving

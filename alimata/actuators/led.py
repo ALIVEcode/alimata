@@ -1,7 +1,7 @@
 from alimata.core.board import Board
 from alimata.core.core import PIN_MODE, WRITE_MODE
 from alimata.actuators.actuator import Actuator
-
+from typing import Union
 
 
 class Led(Actuator):
@@ -24,7 +24,7 @@ class Led(Actuator):
     off()
         Turn the led off
     """
-    def __init__(self, board: Board, pin):
+    def __init__(self, board: Board, pin: Union[str, int]):
         super().__init__(board=board, pin=pin, type_=PIN_MODE.ANALOG_OUTPUT)
 
         # Initialises the led to off
