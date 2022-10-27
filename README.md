@@ -6,24 +6,25 @@ Alimata is a python library used to simplify the implementation of [pymata-expre
 
 ## Requirements
 
-- pymata-express
-- FirmataExpress
+- python 3.7 or higher
+- telemetrix
+- Telemtrix4Arduino
 
 ## Installing
 
-### Pymata Express
+### Telemetrix
 
-To install Pymata Express on Linux (including Raspberry Pi) and macOS computers, open a terminal window and type: `sudo pip3 install pymata-express`
+To install Telemetrix on Linux (including Raspberry Pi) and macOS computers, open a terminal window and type: `sudo pip3 install telemetrix`
 
-For Windows users type: `pip install pymata-express`
+For Windows users type: `pip install telemetrix`
 
-### Firmata Express
+### Telemtrix4Arduino
 
 1. Open the Arduino IDE and select Tools/Manage Libraries
-2. Search for "FirmataExpress"
+2. Search for "Telemtrix4Arduino"
 3. Install
-4. FirmataExpress also requires that the Ultrasonic library by Erick Simões be installed.
-5. Open the firmataexpress example
+4. Telemtrix4Arduino also requires other library just install all of them.
+5. Open the Telemtrix4Arduino example
 6. If you plan to use multiple arduino use `#define ARDUINO_INSTANCE_ID 1`
 7. Flash it to the arduino
 

@@ -1,17 +1,16 @@
 from alimata.core.board import Board
 from alimata.core.core import PIN_MODE, WRITE_MODE
 from alimata.actuators.actuator import Actuator
-import asyncio
-
+from typing import Union
 
 
 class Led(Actuator):
     """
     A class used to represent a Led
 
-    Attributes
+    Properties
     ----------
-    status : bool
+    data : bool
         the status of the led (on or off)
     intensity : int
         the intensity of the led (0-255)
@@ -25,48 +24,40 @@ class Led(Actuator):
     off()
         Turn the led off
     """
-    def __init__(self, board: Board, pin):
-        self.board = board
-        self.pin : str = pin
-        self.__status : bool = True
-        self.__intensity : int = 255
+    def __init__(self, board: Board, pin: Union[str, int]):
+        super().__init__(board=board, pin=pin, type_=PIN_MODE.ANALOG_OUTPUT)
 
-        # set the event loop
-        self.loop = asyncio.get_event_loop()
+        # Initialises the led to off
+        self.__data = False
 
-        
-        # Start the async init
-        self.loop.run_until_complete(self.async_init())
-
-    # Set the pin of the led
-    # call this method if you initialize the class in an async function
-    async def async_init(self):
-        await self.board.set_pin_mode(self.pin, PIN_MODE.PWM)
+        # Initialises the intensity to 255
+        self.__intensity = 255
 
 
     async def toggle(self):
         """
         Toggle the led on or off \n
         """
-        if self.__status:
-            await self.off(self)
+        if self.__data:
+            self.off()
         else:
-            await self.on(self)
+            self.on()
 
     
     async def on(self):
         """
         Turn the led on \n
         """
-        self.__status = True
-        await self.board.write_to_pin(self.pin, WRITE_MODE.PWM, 255)
+        self.__data = True # Set the status of the led to on
+        self.board.write_to_pin(self.pin, WRITE_MODE.ANALOG, self.__intensity) # Set the intensity of the led
+        # await self.board.write_to_pin(self.pin, WRITE_MODE.PWM, 255)
     
     async def off(self):
         """
         Turn the led off \n
         """
-        self.__status = False
-        await self.board.write_to_pin(self.pin, WRITE_MODE.PWM, 0)
+        self.__data = False # Set the status of the led to off
+        self.board.write_to_pin(self.pin, WRITE_MODE.ANALOG, 0)
 
 
 
@@ -84,23 +75,21 @@ class Led(Actuator):
         Set the intensity of the led [0-255]\n
         """        
         self.__intensity = intensity
-        await self.board.write_to_pin(self.pin, WRITE_MODE.PWM, intensity)
+        self.board.write_to_pin(self.pin, WRITE_MODE.ANALOG, intensity)
 
   
 
     @property
-    def status(self):
+    def data(self):
         """
         Get or Set the current status of the led [True/False]\n
         """
-        return self.__status
+        return self.__data
     
-    @status.setter
-    async def status(self, status: bool):
-        """
-        Set the status of the led [True/False]\n"""
-        self.__status = status
+
+    @data.setter
+    def data(self, status: bool):
         if status:
-            await self.on()
+            self.on()
         else:
-            await self.off()
+            self.off()

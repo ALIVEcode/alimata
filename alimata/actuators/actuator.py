@@ -1,7 +1,52 @@
-from pymata_express import pymata_express
+from alimata.core.board import Board
+from alimata.core.core import PIN_MODE, WRITE_MODE
+from typing import Union
 
+from abc import ABC, abstractmethod
 
-class Actuator:
+class Actuator(ABC):
 
-    def __init__(self, board: pymata_express.PymataExpress) -> None:
+   # Constructor of the class Actuator
+    def __init__(self, 
+    pin: Union[str, int], 
+    board: Board,
+    type_: PIN_MODE,
+    min_pulse: int = 544,
+    max_pulse: int = 2400,
+    step_per_revolution: int = 1
+    ):
+
+        # Create Public Attributes
         self.board = board
+        self.pin = pin
+
+        # Create Private Attributes
+        self.__type = type_
+        self.__min_pulse = min_pulse
+        self.__max_pulse = max_pulse
+        self.__step_per_revolution = step_per_revolution
+
+        # Set the pin and other properties of the actuator
+        self.board.set_pin_mode(
+            pin=self.pin,
+            type_=self.__type,
+            min_pulse=self.__min_pulse,
+            max_pulse=self.__max_pulse,)
+
+
+   
+   
+
+    # MUST BE IMPLEMENTED IN THE CHILD CLASS
+    @property
+    @abstractmethod
+    def data(self):
+        """Return the data of the actuator"""
+        pass
+
+    # MUST BE IMPLEMENTED IN THE CHILD CLASS
+    @data.setter
+    @abstractmethod
+    def data(self, value):
+        """Set the data of the actuator"""
+        pass
