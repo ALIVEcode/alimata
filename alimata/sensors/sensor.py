@@ -26,12 +26,12 @@ class Sensor(ABC):
 
     # Constructor of the class Sensor
     def __init__(self, 
-                pin: str, 
+                pin: Union[str, int, tuple], 
                 board: Board,
                 type_: str, 
                 dht_type: Optional[DHT_TYPE] = None, # Facultative
                 differential: Optional[int] = None, # Facultative
-                echo_pin: Optional[Union[str, int]] = None, # Facultative
+                timeout: Optional[int] = 80000, # Facultative
                 on_change: Optional[Callable[[list], None]] = None # Facultative
                 ):
 
@@ -43,7 +43,7 @@ class Sensor(ABC):
         self.__type = type_
         self.__dht_type = dht_type
         self.__differential = differential
-        self.__echo_pin = echo_pin
+        self.__timeout = timeout
         self.__on_change: Optional[Callable[[list], None]] = on_change
 
         # Set the pin and callback of the sensor
@@ -53,7 +53,7 @@ class Sensor(ABC):
             dht_type=self.__dht_type,
             callback=self.__callback,
             differential=self.__differential,
-            echo_pin=self.__echo_pin)
+            timeout=self.__timeout)
 
     
     def on_change(self, on_change: Callable[[list], None]):

@@ -1,5 +1,5 @@
 from alimata.core.board import Board
-from alimata.core.core import PIN_MODE, WRITE_MODE
+from alimata.core.core import PIN_MODE
 from typing import Union
 
 from abc import ABC, abstractmethod

@@ -1,6 +1,6 @@
 from alimata.core.core import DHT_TYPE, PIN_MODE, WRITE_MODE, print_warning
 from alimata.core.error import AlimataUnexpectedPin
-from telemetrix import telemetrix
+from pymata4 import pymata4
 from typing import Optional, Union
 import sys, datetime
 
@@ -33,12 +33,14 @@ class Board:
     """
 
     def __init__(self, board_id: int = 1, COM_port=None):
-        self.__board = telemetrix.Telemetrix(arduino_instance_id=board_id, com_port=COM_port, arduino_wait=2)
+        self.__board = pymata4.Pymata4(arduino_instance_id=board_id, com_port=COM_port, arduino_wait=2)
         self.__board_id = board_id
         self.__is_started = False
 
         self.__setup_func = None
         self.__loop_func = None
+
+        self.__num_of_digital_pins = len(self.__board.digital_pins)
 
     
     def __main(self):
@@ -85,16 +87,21 @@ class Board:
 
     
     # Converting the analog pin value to the correct one depending on the board and function used
-    def parse_pin_number(self, pin: Union[str, int], type_) -> int:
+    def parse_pin_number(self, pin: Union[str, int, tuple], type_) -> int:
         if type(pin) == str:
             if pin.startswith("A"): #Check if it's an analog pin
-                if type_ != PIN_MODE.ANALOG_INPUT or type_ != PIN_MODE.ANALOG_OUTPUT or type_ != WRITE_MODE.ANALOG:
-                    raise AlimataUnexpectedPin("Can't assign a analog pin to a digital function")
                 pin = pin[1:]
+                if type_ != PIN_MODE.ANALOG_INPUT:
+                    pin = int(pin) + self.__num_of_digital_pins
+        if type(pin) == tuple:
+            mapped_pin = list(pin)
+            for i in range(len(pin)):
+                mapped_pin[i] = self.parse_pin_number(pin[i], type_)
+            return tuple(mapped_pin)
         return int(pin)
 
 
-    def set_pin_mode(self, pin: Union[str, int], type_: PIN_MODE, callback=None, dht_type: Optional[DHT_TYPE] = None, differential: int = 1, echo_pin: Union[str, int] = None, min_pulse: int = 544, max_pulse:int =2400):
+    def set_pin_mode(self, pin: Union[str, int, tuple], type_: PIN_MODE, callback=None, dht_type: Optional[DHT_TYPE] = None, timeout=80000, differential: int = 1, min_pulse: int = 544, max_pulse:int =2400):
         pin = self.parse_pin_number(pin, type_)
         
         if type_ == PIN_MODE.DIGITAL_INPUT:
@@ -106,37 +113,39 @@ class Board:
         elif type_ == PIN_MODE.ANALOG_INPUT:
             self.__board.set_pin_mode_analog_input(pin, differential, callback)
         elif type_ == PIN_MODE.ANALOG_OUTPUT:
-            self.__board.set_pin_mode_analog_output(pin)
+            self.__board.set_pin_mode_pwm_output(pin)
         elif type_ == PIN_MODE.SONAR:
-            if echo_pin is None:
-                raise TypeError("echo_pin is required to setup a sonar")
+            if type(pin) is not tuple:
+                raise TypeError("pin must be a tuple (trigger_pin, echo_pin)")
             else:
-                self.__board.set_pin_mode_sonar(pin, echo_pin, callback)
+                self.__board.set_pin_mode_sonar(pin[0], pin[1], callback, timeout)
         elif type_ == PIN_MODE.DHT:
             if dht_type is None:
                 raise TypeError("dht_type is required to setup a dht")
-            self.__board.set_pin_mode_dht(pin, callback, dht_type)
+            self.__board.set_pin_mode_dht(pin, callback=callback, sensor_type=dht_type, differential=differential)
         elif type_ == PIN_MODE.SERVO:
             self.__board.set_pin_mode_servo(pin, min_pulse, max_pulse)
         elif type_ == PIN_MODE.SERVO_DETATCH:
             self.__board.set_pin_mode_servo_detach(pin)
+        elif type_ == PIN_MODE.TONE:
+            self.__board.set_pin_mode_tone(pin)
         else:
             raise TypeError("type must a value from the PIN_MODE enum")
 
         
     # Use PWM for analog write
-    def write_to_pin(self, pin: Union[str, int], type_: WRITE_MODE, value: int):
+    def write_to_pin(self, pin: Union[str, int], type_: WRITE_MODE, value: int, duration: Optional[int]):
         pin = self.parse_pin_number(pin, type_)
 
         if type_ == WRITE_MODE.ANALOG:
             if value >= 0 or value <= 255:
-                self.__board.analog_write(pin, value)
+                self.__board.pwm_write(pin, value)
             elif value > 255:
                 print_warning("Value is greater than 255, setting value to 255")
-                self.__board.analog_write(pin, 255)
+                self.__board.pwm_write(pin, 255)
             elif value < 0:
                 print_warning("Value is less than 0, setting value to 0")
-                self.__board.analog_write(pin, 0)
+                self.__board.pwm_write(pin, 0)
         elif type_ == WRITE_MODE.DIGITAL:
             if value not in [0, 1]:
                 raise TypeError("value must be equal to 0 or 1")
@@ -144,6 +153,14 @@ class Board:
                 self.__board.digital_write(pin, value)
         elif type_ == WRITE_MODE.SERVO:
             self.__board.servo_write(pin, value)
+        elif type_ == WRITE_MODE.TONE:
+            if duration is None:
+                raise TypeError("duration (in ms) is required for tone")
+            self.__board.play_tone(pin, value, duration)
+        elif type_ == WRITE_MODE.TONE_CONTINUOUS:
+            self.__board.play_tone_continuously(pin, value)
+        elif type_ == WRITE_MODE.TONE_STOP:
+            self.__board.play_tone_off(pin)
         else:
             raise TypeError("type must be one of the WRITE_MODE enum")
     
