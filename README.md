@@ -2,29 +2,29 @@
 
 ## What is it?
 
-Alimata is a python library used to simplify the implementation of [pymata-express](https://mryslab.github.io/pymata-express/) library
+Alimata is a python library used to simplify the implementation of [pymata4](https://mryslab.github.io/pymata4/) library
 
 ## Requirements
 
 - python 3.7 or higher
-- telemetrix
-- Telemtrix4Arduino
+- Pymata4
+- FirmataExpress
 
 ## Installing
 
-### Telemetrix
+### Pymata4
 
-To install Telemetrix on Linux (including Raspberry Pi) and macOS computers, open a terminal window and type: `sudo pip3 install telemetrix`
+To install Pymata4 on Linux (including Raspberry Pi) and macOS computers, open a terminal window and type: `sudo pip3 install pymata4`
 
-For Windows users type: `pip install telemetrix`
+For Windows users type: `pip install pymata4`
 
-### Telemtrix4Arduino
+### FirmataExpress
 
 1. Open the Arduino IDE and select Tools/Manage Libraries
-2. Search for "Telemtrix4Arduino"
+2. Search for "FirmataExpress"
 3. Install
-4. Telemtrix4Arduino also requires other library just install all of them.
-5. Open the Telemtrix4Arduino example
+4. FirmataExpress also requires other library just install all of them.
+5. Open the FirmataExpress example
 6. If you plan to use multiple arduino use `#define ARDUINO_INSTANCE_ID 1`
 7. Flash it to the arduino
 
@@ -38,10 +38,10 @@ Creating a new board
 Making the setup and loop function and starting the board
 
 ```python
-    async def setup():
+    def setup():
         #Code here is run once
 
-    async def loop():
+    def loop():
         #Code here is run in a loop
 
     #Starting the board by passing the setup and loop function

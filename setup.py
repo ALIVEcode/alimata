@@ -14,7 +14,7 @@ README = (HERE / "README.md").read_text()
 
 if __name__ == "__main__":
     setup(name='alimata',
-          author='Nils and Francis M-G',
+          author='Nils Lahaye and Francis M-G',
           author_email="alivecode.developers@gmail.com",
           version=alimata.__version__,
           description='Alimata is a Python library to simplify the use of the pymata-express library.',
@@ -29,6 +29,6 @@ if __name__ == "__main__":
               include=['alimata', 'alimata.*']),
           include_package_data=True,
           python_requires=">=3.7",
-          install_requires=["telemetrix>=1.10.0"],
+          install_requires=["pymata4>=1.15.0"],
           setup_requires="setuptools",
           )
