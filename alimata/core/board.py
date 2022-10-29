@@ -134,7 +134,7 @@ class Board:
 
         
     # Use PWM for analog write
-    def write_to_pin(self, pin: Union[str, int], type_: WRITE_MODE, value: int, duration: Optional[int]):
+    def write_to_pin(self, pin: Union[str, int], type_: WRITE_MODE, value: int, duration: Optional[int] = None):
         pin = self.parse_pin_number(pin, type_)
 
         if type_ == WRITE_MODE.ANALOG:
