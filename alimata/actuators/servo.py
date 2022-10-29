@@ -3,7 +3,7 @@ from alimata.core.board import Board
 from alimata.core.core import PIN_MODE, WRITE_MODE, maprange, print_warning, normalize_angle
 import time
 from typing import Union
-from threading import Thread, enumerate
+from threading import Thread
 
 class Servo(Actuator):
     """

@@ -1,4 +1,3 @@
-import asyncio
 from alimata.core.board import Board
 from alimata.actuators.servo import Servo
 from time import sleep

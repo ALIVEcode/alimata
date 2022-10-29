@@ -21,7 +21,7 @@ class Board:
         Starting the board : (setup_func, loop_func)
     is_started : bool
         Retuns if the board is started or not (read only)
-    telemetrix_board : telemetrix
+    pymata_board : telemetrix
         The telemetrix board object (read only)
     set_pin_mode : function
         Setting the pin mode : (pin, type, callback=None, differential=1, echo_pin=None, min_pulse=544, max_pulse=2400)
@@ -87,21 +87,21 @@ class Board:
 
     
     # Converting the analog pin value to the correct one depending on the board and function used
-    def parse_pin_number(self, pin: Union[str, int, tuple], type_) -> int:
+    def parse_pin_number(self, pin: Union[str, int, list], type_) -> int:
         if type(pin) == str:
             if pin.startswith("A"): #Check if it's an analog pin
                 pin = pin[1:]
                 if type_ != PIN_MODE.ANALOG_INPUT:
                     pin = int(pin) + self.__num_of_digital_pins
-        if type(pin) == tuple:
-            mapped_pin = list(pin)
+        if type(pin) == list:
+            mapped_pin = pin.copy()
             for i in range(len(pin)):
                 mapped_pin[i] = self.parse_pin_number(pin[i], type_)
-            return tuple(mapped_pin)
+            return mapped_pin
         return int(pin)
 
 
-    def set_pin_mode(self, pin: Union[str, int, tuple], type_: PIN_MODE, callback=None, dht_type: Optional[DHT_TYPE] = None, timeout=80000, differential: int = 1, min_pulse: int = 544, max_pulse:int =2400):
+    def set_pin_mode(self, pin: Union[str, int, list], type_: PIN_MODE, callback=None, dht_type: Optional[DHT_TYPE] = None, timeout=80000, differential: int = 1, min_pulse: int = 544, max_pulse:int =2400, steps_per_revolution: int = None):
         pin = self.parse_pin_number(pin, type_)
         
         if type_ == PIN_MODE.DIGITAL_INPUT:
@@ -115,8 +115,8 @@ class Board:
         elif type_ == PIN_MODE.ANALOG_OUTPUT:
             self.__board.set_pin_mode_pwm_output(pin)
         elif type_ == PIN_MODE.SONAR:
-            if type(pin) is not tuple:
-                raise TypeError("pin must be a tuple (trigger_pin, echo_pin)")
+            if type(pin) is not list:
+                raise TypeError("pin must be a list (trigger_pin, echo_pin)")
             else:
                 self.__board.set_pin_mode_sonar(pin[0], pin[1], callback, timeout)
         elif type_ == PIN_MODE.DHT:
@@ -125,6 +125,13 @@ class Board:
             self.__board.set_pin_mode_dht(pin, callback=callback, sensor_type=dht_type, differential=differential)
         elif type_ == PIN_MODE.SERVO:
             self.__board.set_pin_mode_servo(pin, min_pulse, max_pulse)
+        elif type_ == PIN_MODE.STEPPER:
+            if type(pin) is not list:
+                raise TypeError("pin must be a list of 2 or 4 pins")
+            elif steps_per_revolution is None:
+                raise TypeError("steps_per_revolution is required to setup a stepper")
+            else:
+                self.__board.set_pin_mode_stepper(steps_per_revolution=steps_per_revolution, stepper_pins=pin)
         elif type_ == PIN_MODE.TONE:
             self.__board.set_pin_mode_tone(pin)
         else:
@@ -132,7 +139,7 @@ class Board:
 
         
     # Use PWM for analog write
-    def write_to_pin(self, pin: Union[str, int], type_: WRITE_MODE, value: int, duration: Optional[int] = None):
+    def write_to_pin(self, pin: Union[str, int], type_: WRITE_MODE, value: int, duration: Optional[int] = None, number_of_steps: Optional[int] = None):
         pin = self.parse_pin_number(pin, type_)
 
         if type_ == WRITE_MODE.ANALOG:
@@ -151,6 +158,11 @@ class Board:
                 self.__board.digital_write(pin, value)
         elif type_ == WRITE_MODE.SERVO:
             self.__board.servo_write(pin, value)
+        elif type_ == WRITE_MODE.STEPPER:
+            if number_of_steps is None:
+                raise TypeError("number_of_steps is required to write to a stepper")
+            else:
+                self.__board.stepper_write(motor_speed=value, number_of_steps=number_of_steps)
         elif type_ == WRITE_MODE.TONE:
             if duration is None:
                 raise TypeError("duration (in ms) is required for tone")
@@ -163,5 +175,5 @@ class Board:
             raise TypeError("type must be one of the WRITE_MODE enum")
     
     @property
-    def telemetrix_board(self):
+    def pymata_board(self):
         return self.__board
