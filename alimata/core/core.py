@@ -34,12 +34,14 @@ class PIN_MODE(str, Enum):
     SONAR = "SONAR"
     DHT = "DHT"
     SERVO = "SERVO"
+    STEPPER = "STEPPER"
     TONE = "TONE"
 
 class WRITE_MODE(str, Enum):
     ANALOG = "ANALOG"
     DIGITAL = "DIGITAL"
     SERVO = "SERVO"
+    STEPPER = "STEPPER"
     TONE = "TONE"
     TONE_CONTINUOUS = "TONE_CONTINUOUS"
     TONE_STOP = "TONE_STOP"
