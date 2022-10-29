@@ -34,7 +34,6 @@ class PIN_MODE(str, Enum):
     SONAR = "SONAR"
     DHT = "DHT"
     SERVO = "SERVO"
-    SERVO_DETATCH = "SERVO_DETATCH"
     TONE = "TONE"
 
 class WRITE_MODE(str, Enum):

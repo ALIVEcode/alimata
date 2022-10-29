@@ -125,8 +125,6 @@ class Board:
             self.__board.set_pin_mode_dht(pin, callback=callback, sensor_type=dht_type, differential=differential)
         elif type_ == PIN_MODE.SERVO:
             self.__board.set_pin_mode_servo(pin, min_pulse, max_pulse)
-        elif type_ == PIN_MODE.SERVO_DETATCH:
-            self.__board.set_pin_mode_servo_detach(pin)
         elif type_ == PIN_MODE.TONE:
             self.__board.set_pin_mode_tone(pin)
         else:
