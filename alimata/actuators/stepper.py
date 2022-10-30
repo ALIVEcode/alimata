@@ -43,9 +43,9 @@ class Stepper(Actuator):
     def step(self, steps: int, speed: Optional[int] = None):
         """Move the stepper of the given number of steps (negative for reverse)"""
         if speed is not None:
-            self.speed = abs(speed)
+            self.__speed = abs(speed)
             
-        self.board.write_to_pin(pin=self.pin, type_=WRITE_MODE.STEPPER, value=self.speed, number_of_steps=steps)
+        self.board.write_to_pin(pin=self.pin, type_=WRITE_MODE.STEPPER, value=self.__speed, number_of_steps=steps)
 
     def stop(self):
         """NOT WORKING : Stop the stepper"""

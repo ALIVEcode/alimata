@@ -64,7 +64,7 @@ class Servo(Actuator):
         self.__thread = None
         
     
-    def move_to(self, end_angle: int, duration: int = 0, threaded: bool = False):
+    def move_to(self, end_angle: int, duration: int = 0, wait: bool = True):
         """
         Move the servo to the given angle in the given time in ms (optional), do it in parallel if threaded is True (optional)
         """
@@ -76,7 +76,7 @@ class Servo(Actuator):
             self.data = end_angle
             return
 
-        if threaded:
+        if not wait:
             self.__thread = Thread(target=self.__move, args=(end_angle, duration))
             self.__thread.start()
         else:
