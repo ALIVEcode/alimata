@@ -23,12 +23,12 @@ class Stepper(Actuator):
     @property
     def data(self):
         """Does nothing"""
-        return
+        raise NotImplementedError()
     
     @data.setter
     def data(self):
         """Does nothing"""
-        pass
+        raise NotImplementedError()
 
     @property
     def speed(self):
