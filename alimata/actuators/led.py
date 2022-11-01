@@ -34,7 +34,7 @@ class Led(Actuator):
         self.__intensity = 255
 
 
-    async def toggle(self):
+    def toggle(self):
         """
         Toggle the led on or off \n
         """
@@ -44,7 +44,7 @@ class Led(Actuator):
             self.on()
 
     
-    async def on(self):
+    def on(self):
         """
         Turn the led on \n
         """
@@ -52,7 +52,7 @@ class Led(Actuator):
         self.board.write_to_pin(self.pin, WRITE_MODE.ANALOG, self.__intensity) # Set the intensity of the led
         # await self.board.write_to_pin(self.pin, WRITE_MODE.PWM, 255)
     
-    async def off(self):
+    def off(self):
         """
         Turn the led off \n
         """
@@ -70,7 +70,7 @@ class Led(Actuator):
        
      
     @intensity.setter
-    async def intensity(self, intensity: int):
+    def intensity(self, intensity: int):
         """
         Set the intensity of the led [0-255]\n
         """        

@@ -24,9 +24,11 @@ class Sonar(Sensor):
         
     """
 
-    def __init__(self, board: Board.board, trigger_pin, echo_pin, on_change: Union[Callable[[List[Union[float, int]]], None], None ]= None):
+    def __init__(self, board: Board.board, trigger_pin: Union[str, int], echo_pin: Union[str, int], on_change: Union[Callable[[List[Union[float, int]]], None], None ]= None, timeout: int = 80000):
 
-        super().__init__(board=board, pin=trigger_pin, on_change=on_change, type_=PIN_MODE.SONAR, echo_pin=echo_pin)
+        pin_ = [trigger_pin, echo_pin]
+
+        super().__init__(board=board, pin=pin_, on_change=on_change, type_=PIN_MODE.SONAR, timeout=timeout)
 
         self.__data = None
 

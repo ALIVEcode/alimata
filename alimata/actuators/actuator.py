@@ -1,5 +1,5 @@
 from alimata.core.board import Board
-from alimata.core.core import PIN_MODE, WRITE_MODE
+from alimata.core.core import PIN_MODE
 from typing import Union
 
 from abc import ABC, abstractmethod
@@ -13,7 +13,7 @@ class Actuator(ABC):
     type_: PIN_MODE,
     min_pulse: int = 544,
     max_pulse: int = 2400,
-    step_per_revolution: int = 1
+    steps_per_revolution: int = None,
     ):
 
         # Create Public Attributes
@@ -24,14 +24,15 @@ class Actuator(ABC):
         self.__type = type_
         self.__min_pulse = min_pulse
         self.__max_pulse = max_pulse
-        self.__step_per_revolution = step_per_revolution
+        self.__steps_per_revolution = steps_per_revolution
 
         # Set the pin and other properties of the actuator
         self.board.set_pin_mode(
             pin=self.pin,
             type_=self.__type,
             min_pulse=self.__min_pulse,
-            max_pulse=self.__max_pulse,)
+            max_pulse=self.__max_pulse,
+            steps_per_revolution=self.__steps_per_revolution)
 
 
    

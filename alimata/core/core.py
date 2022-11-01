@@ -34,14 +34,22 @@ class PIN_MODE(str, Enum):
     SONAR = "SONAR"
     DHT = "DHT"
     SERVO = "SERVO"
-    SERVO_DETATCH = "SERVO_DETATCH"
+    STEPPER = "STEPPER"
+    TONE = "TONE"
 
 class WRITE_MODE(str, Enum):
     ANALOG = "ANALOG"
     DIGITAL = "DIGITAL"
     SERVO = "SERVO"
     STEPPER = "STEPPER"
+    TONE = "TONE"
+    TONE_CONTINUOUS = "TONE_CONTINUOUS"
+    TONE_STOP = "TONE_STOP"
 
-class DHT_TYPE(int, Enum):
-    DHT11 = 11
-    DHT22 = 22
+class DHT_TYPE(str, Enum):
+    DHT11 = "DHT11"
+    DHT12 = "DHT12"
+    DHT21 = "DHT21"
+    DHT22 = "DHT22"
+    AM2301 = "AM2301"
+

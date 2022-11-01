@@ -3,6 +3,7 @@ from alimata.core.board import Board
 from alimata.core.core import PIN_MODE, WRITE_MODE, maprange, print_warning, normalize_angle
 import time
 from typing import Union
+from threading import Thread
 
 class Servo(Actuator):
     """
@@ -17,12 +18,11 @@ class Servo(Actuator):
     
     Methods
     -------
-    move_to(end_angle: int, duration: int = 0)
+    move_to(end_angle: int, duration: int = 0, threaded: bool = False)
         Move the servo to the given angle in the given time in ms (optional)
+        Run it in parallel if threaded is True (optional)
     stop()
         Stop the servo
-    detatch()
-        Detatch the servo for reuse
     """
 
     def __init__(self, board: Board,  pin_: Union[str, int], min_pulse: int = 544, max_pulse: int = 2400):
@@ -35,6 +35,8 @@ class Servo(Actuator):
         self.__data = 0
         self.data = 0
 
+        self.__thread = None
+
     
     @property
     def data(self):
@@ -45,8 +47,8 @@ class Servo(Actuator):
     def data(self, angle: int):
         """Set the angle of the servo"""
         if self.__runing:
-            print_warning("Stoping servo, then setting angle")
-            self.stop()
+            print_warning("Servo currently running, stop the servo before setting the angle")
+            return
         
         self.__data = normalize_angle(angle)
         self.board.write_to_pin(pin=self.pin, type_=WRITE_MODE.SERVO, value=self.__data)
@@ -59,22 +61,28 @@ class Servo(Actuator):
     def stop(self):
         """Stop the servo"""
         self.__runing = False
-
-    def detatch(self):
-        """Detatch the servo"""
-        self.board.set_pin_mode(self.pin, PIN_MODE.SERVO_DETATCH)
+        self.__thread = None
         
     
-    def move_to(self, end_angle: int, duration: int = 0):
-        """Move the servo to the given angle in the given time in ms (optional)"""
+    def move_to(self, end_angle: int, duration: int = 0, wait: bool = True):
+        """
+        Move the servo to the given angle in the given time in ms (optional), do it in parallel if threaded is True (optional)
+        """
         if self.__runing:
-            print_warning("Stoping servo, then setting angle")
-            self.stop()
+            print_warning("Servo currently running, stop the servo before setting the angle")
+            return
 
         if duration == 0:
             self.data = end_angle
             return
 
+        if not wait:
+            self.__thread = Thread(target=self.__move, args=(end_angle, duration))
+            self.__thread.start()
+        else:
+            self.__move(end_angle, duration)
+    
+    def __move(self, end_angle: int, duration: int = 0):
         self.__runing = True
         start_angle = self.__data
         start_time = time.time()
@@ -86,8 +94,10 @@ class Servo(Actuator):
             if elapsed_time > duration or i == normalized_end_angle:
                 self.board.write_to_pin(self.pin, WRITE_MODE.SERVO, normalized_end_angle)
                 self.__runing = False
+                self.__thread = None
                 break
             else:
                 i = int(maprange(elapsed_time, 0, duration, start_angle, normalized_end_angle))
                 self.board.write_to_pin(self.pin, WRITE_MODE.SERVO, i)
-                time.sleep(0.01)   
+                time.sleep(0.01)
+        
