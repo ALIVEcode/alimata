@@ -22,10 +22,9 @@ def loop():
     sleep(1)
     piezo.playTone(1000, 1000)
     sleep(2)
-    piezo.stopTone()
-    sleep(1)
     piezo.playTone(5000)
     sleep(0.5)
+    piezo.stopTone()
 
 
 

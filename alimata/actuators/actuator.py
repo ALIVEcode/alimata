@@ -2,7 +2,7 @@ from alimata.core.board import Board
 from alimata.core.core import PIN_MODE
 from typing import Union
 
-from abc import ABC, abstractmethod
+from abc import ABC
 
 class Actuator(ABC):
 
@@ -37,17 +37,3 @@ class Actuator(ABC):
 
    
    
-
-    # MUST BE IMPLEMENTED IN THE CHILD CLASS
-    @property
-    @abstractmethod
-    def data(self):
-        """Return the data of the actuator"""
-        pass
-
-    # MUST BE IMPLEMENTED IN THE CHILD CLASS
-    @data.setter
-    @abstractmethod
-    def data(self, value):
-        """Set the data of the actuator"""
-        pass
