@@ -142,6 +142,7 @@ class Board:
     def write_to_pin(self, pin: Union[str, int], type_: WRITE_MODE, value: int, duration: Optional[int] = None, number_of_steps: Optional[int] = None):
         pin = self.parse_pin_number(pin, type_)
 
+        # Analog OUTPUT
         if type_ == WRITE_MODE.ANALOG:
             if value >= 0 or value <= 255:
                 self.__board.pwm_write(pin, value)
@@ -151,26 +152,39 @@ class Board:
             elif value < 0:
                 print_warning("Value is less than 0, setting value to 0")
                 self.__board.pwm_write(pin, 0)
+
+        # Digital OUTPUT
         elif type_ == WRITE_MODE.DIGITAL:
             if value not in [0, 1]:
                 raise TypeError("value must be equal to 0 or 1")
             else:
                 self.__board.digital_write(pin, value)
+
+        # Servo OUTPUT
         elif type_ == WRITE_MODE.SERVO:
             self.__board.servo_write(pin, value)
+
+        # Stepper OUTPUT
         elif type_ == WRITE_MODE.STEPPER:
             if number_of_steps is None:
                 raise TypeError("number_of_steps is required to write to a stepper")
             else:
                 self.__board.stepper_write(motor_speed=value, number_of_steps=number_of_steps)
+
+        # Tone Duration OUTPUT
         elif type_ == WRITE_MODE.TONE:
             if duration is None:
                 raise TypeError("duration (in ms) is required for tone")
             self.__board.play_tone(pin, value, duration)
+
+        # Tone continuous OUTPUT
         elif type_ == WRITE_MODE.TONE_CONTINUOUS:
             self.__board.play_tone_continuously(pin, value)
+
+        # Stop Tone OUTPUT
         elif type_ == WRITE_MODE.TONE_STOP:
             self.__board.play_tone_off(pin)
+
         else:
             raise TypeError("type must be one of the WRITE_MODE enum")
     
