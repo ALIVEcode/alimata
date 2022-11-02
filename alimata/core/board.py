@@ -98,6 +98,9 @@ class Board:
             for i in range(len(pin)):
                 mapped_pin[i] = self.parse_pin_number(pin[i], type_)
             return mapped_pin
+            
+        if type(pin) is not int:
+            raise AlimataUnexpectedPin("The pin must either be in an int (1, 2, 3 ...) or a string (A1, A2, A3 ...)")
         return int(pin)
 
 
