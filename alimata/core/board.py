@@ -90,10 +90,10 @@ class Board:
     def parse_pin_number(self, pin: Union[str, int, list], type_) -> int:
         if type(pin) == str:
             if pin.startswith("A"): #Check if it's an analog pin
-                pin = pin[1:]
+                pin = pin[1:] #Strip the A from the pin name
                 if type_ != PIN_MODE.ANALOG_INPUT:
                     pin = int(pin) + self.__num_of_digital_pins
-        if type(pin) == list:
+        elif type(pin) == list:
             mapped_pin = pin.copy()
             for i in range(len(pin)):
                 mapped_pin[i] = self.parse_pin_number(pin[i], type_)
@@ -101,70 +101,66 @@ class Board:
         return int(pin)
 
 
-    def set_pin_mode(self, pin: Union[str, int, list], type_: PIN_MODE, callback=None, dht_type: Optional[DHT_TYPE] = None, timeout=80000, differential: int = 1, min_pulse: int = 544, max_pulse:int =2400, steps_per_revolution: int = None):
-        pin = self.parse_pin_number(pin, type_)
+    def set_pin_mode(self, pin: Union[str, int, list], type_: PIN_MODE, callback=None, dht_type: Optional[DHT_TYPE] = None, timeout=80000, differential: int = 1, min_pulse: int = 544, max_pulse:int =2400, steps_per_revolution: Optional[int] = None):
+        parsed_pin = self.parse_pin_number(pin=pin, type=type_)
         
         if type_ == PIN_MODE.DIGITAL_INPUT:
-            self.__board.set_pin_mode_digital_input(pin, callback)
+            self.__board.set_pin_mode_digital_input(pin=parsed_pin, callback=callback)
         elif type_ == PIN_MODE.DIGITAL_OUTPUT:
-            self.__board.set_pin_mode_digital_output(pin)
+            self.__board.set_pin_mode_digital_output(pin=parsed_pin)
         elif type_ == PIN_MODE.PULLUP:
-            self.__board.set_pin_mode_digital_input_pullup(pin, callback)
+            self.__board.set_pin_mode_digital_input_pullup(pin=parsed_pin, callback=callback)
         elif type_ == PIN_MODE.ANALOG_INPUT:
-            self.__board.set_pin_mode_analog_input(pin, differential, callback)
+            self.__board.set_pin_mode_analog_input(pin=parsed_pin, differential=differential, callback=callback)
         elif type_ == PIN_MODE.ANALOG_OUTPUT:
-            self.__board.set_pin_mode_pwm_output(pin)
+            self.__board.set_pin_mode_pwm_output(pin=parsed_pin)
         elif type_ == PIN_MODE.SONAR:
-            if type(pin) is not list:
+            if type(parsed_pin) is not list:
                 raise TypeError("pin must be a list (trigger_pin, echo_pin)")
             else:
-                self.__board.set_pin_mode_sonar(pin[0], pin[1], callback, timeout)
+                self.__board.set_pin_mode_sonar(trigger_pin=parsed_pin[0], echo_pin=parsed_pin[1], callback=callback, timeout=timeout)
         elif type_ == PIN_MODE.DHT:
             if dht_type is None:
                 raise TypeError("dht_type is required to setup a dht")
-            self.__board.set_pin_mode_dht(pin, callback=callback, sensor_type=dht_type, differential=differential)
+            self.__board.set_pin_mode_dht(pin=parsed_pin, callback=callback, sensor_type=dht_type, differential=differential)
         elif type_ == PIN_MODE.SERVO:
-            self.__board.set_pin_mode_servo(pin, min_pulse, max_pulse)
+            self.__board.set_pin_mode_servo(pin=parsed_pin, min_pulse=min_pulse, max_pulse=max_pulse)
         elif type_ == PIN_MODE.STEPPER:
-            if type(pin) is not list:
+            if type(parsed_pin) is not list:
                 raise TypeError("pin must be a list of 2 or 4 pins")
             elif steps_per_revolution is None:
                 raise TypeError("steps_per_revolution is required to setup a stepper")
             else:
-                self.__board.set_pin_mode_stepper(steps_per_revolution=steps_per_revolution, stepper_pins=pin)
+                self.__board.set_pin_mode_stepper(steps_per_revolution=steps_per_revolution, stepper_pins=parsed_pin)
         elif type_ == PIN_MODE.TONE:
-            self.__board.set_pin_mode_tone(pin)
+            self.__board.set_pin_mode_tone(pin=parsed_pin)
         else:
             raise TypeError("type must a value from the PIN_MODE enum")
 
         
     # Use PWM for analog write
     def write_to_pin(self, pin: Union[str, int], type_: WRITE_MODE, value: int, duration: Optional[int] = None, number_of_steps: Optional[int] = None):
-        pin = self.parse_pin_number(pin, type_)
+        parsed_pin = self.parse_pin_number(pin=pin, type=type_)
 
         # Analog OUTPUT
         if type_ == WRITE_MODE.ANALOG:
             if value >= 0 or value <= 255:
-                self.__board.pwm_write(pin, value)
+                self.__board.pwm_write(pin=parsed_pin, value=value)
             elif value > 255:
                 print_warning("Value is greater than 255, setting value to 255")
-                self.__board.pwm_write(pin, 255)
+                self.__board.pwm_write(pin=parsed_pin, value=255)
             elif value < 0:
                 print_warning("Value is less than 0, setting value to 0")
-                self.__board.pwm_write(pin, 0)
+                self.__board.pwm_write(pin=parsed_pin, value=0)
 
         # Digital OUTPUT
         elif type_ == WRITE_MODE.DIGITAL:
             if value not in [0, 1]:
                 raise TypeError("value must be equal to 0 or 1")
             else:
-                self.__board.digital_write(pin, value)
-
-        # Servo OUTPUT
+                self.__board.digital_write(pin=parsed_pin, value=value)
         elif type_ == WRITE_MODE.SERVO:
-            self.__board.servo_write(pin, value)
-
-        # Stepper OUTPUT
+            self.__board.servo_write(pin=parsed_pin, value=value)
         elif type_ == WRITE_MODE.STEPPER:
             if number_of_steps is None:
                 raise TypeError("number_of_steps is required to write to a stepper")
@@ -175,16 +171,11 @@ class Board:
         elif type_ == WRITE_MODE.TONE:
             if duration is None:
                 raise TypeError("duration (in ms) is required for tone")
-            self.__board.play_tone(pin, value, duration)
-
-        # Tone continuous OUTPUT
+            self.__board.play_tone(pin=parsed_pin, frequency=value, duration=duration)
         elif type_ == WRITE_MODE.TONE_CONTINUOUS:
-            self.__board.play_tone_continuously(pin, value)
-
-        # Stop Tone OUTPUT
+            self.__board.play_tone_continuously(pin=parsed_pin, frequency=value)
         elif type_ == WRITE_MODE.TONE_STOP:
-            self.__board.play_tone_off(pin)
-
+            self.__board.play_tone_off(pin=parsed_pin)
         else:
             raise TypeError("type must be one of the WRITE_MODE enum")
     
