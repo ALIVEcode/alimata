@@ -19,17 +19,6 @@ class Stepper(Actuator):
         #Set the speed of the stepper
         self.__speed = speed
 
-    
-    @property
-    def data(self):
-        """Does nothing"""
-        raise NotImplementedError()
-    
-    @data.setter
-    def data(self):
-        """Does nothing"""
-        raise NotImplementedError()
-
     @property
     def speed(self):
         """Return the speed of the stepper"""

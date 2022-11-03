@@ -29,12 +29,12 @@ class Piezo(Actuator):
 
 
     
-    def playTone(self, frequency: int = 1000, duration: int = None):
+    def playTone(self, frequency: int = 1000, duration: int = 0):
         """
         Turn the led on \n
         """
 
-        if duration is not None:
+        if duration != 0:
             self.board.write_to_pin(pin=self.pin, type_=WRITE_MODE.TONE, value=frequency, duration=duration)
             
             
@@ -51,15 +51,3 @@ class Piezo(Actuator):
         self.board.write_to_pin(pin=self.pin, type_=WRITE_MODE.TONE_STOP, value=None)
 
   
-
-    @property
-    def data(self):
-        """
-        Not implemented
-        """
-        raise NotImplementedError()
-    
-
-    @data.setter
-    def data(self, status: bool):
-        raise NotImplementedError()
