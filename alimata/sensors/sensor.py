@@ -30,7 +30,7 @@ class Sensor(ABC):
                 board: Board,
                 type_: str, 
                 dht_type: Optional[DHT_TYPE] = None, # Facultative
-                differential: Optional[int] = None, # Facultative
+                differential: Optional[int] = 1, # Facultative
                 timeout: Optional[int] = 80000, # Facultative
                 on_change: Optional[Callable[[list], None]] = None # Facultative
                 ):
