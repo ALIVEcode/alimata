@@ -36,6 +36,7 @@ class PIN_MODE(str, Enum):
     SERVO = "SERVO"
     STEPPER = "STEPPER"
     TONE = "TONE"
+    I2C = "I2C"
 
 class WRITE_MODE(str, Enum):
     ANALOG = "ANALOG"
@@ -52,4 +53,11 @@ class DHT_TYPE(str, Enum):
     DHT21 = "DHT21"
     DHT22 = "DHT22"
     AM2301 = "AM2301"
+
+class I2C_COMMAND(str, Enum):
+    READ = "READ"
+    READ_CONTINUOUS = "READ_CONTINUOUS"
+    READ_RESTART_TRANSMISSION = "READ_RESTART_TRANSMISSION"
+    READ_SAVED_DATA = "READ_SAVED_DATA"
+    WRITE = "WRITE"
 

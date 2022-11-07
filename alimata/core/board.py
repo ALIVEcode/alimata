@@ -1,4 +1,4 @@
-from alimata.core.core import DHT_TYPE, PIN_MODE, WRITE_MODE, print_warning
+from alimata.core.core import DHT_TYPE, PIN_MODE, WRITE_MODE, I2C_COMMAND, print_warning
 from alimata.core.error import AlimataUnexpectedPin
 from pymata4 import pymata4
 from typing import Optional, Union
@@ -27,6 +27,8 @@ class Board:
         Setting the pin mode : (pin, type, callback=None, differential=1, echo_pin=None, min_pulse=544, max_pulse=2400)
     write_pin : function
         Writing to a pin : (pin, type, value, duration, step)
+    i2C_comunication : function
+        Sending a i2c command : (command, adress, register, number_of_bytes, args, callback)
     parse_pin_number : function
         Converting the analog pin value to the correct one depending on the board and function used : (pin, pin_type)
     
@@ -137,6 +139,8 @@ class Board:
                 self.__board.set_pin_mode_stepper(steps_per_revolution=steps_per_revolution, stepper_pins=parsed_pin)
         elif type_ == PIN_MODE.TONE:
             self.__board.set_pin_mode_tone(pin_number=parsed_pin)
+        elif type_ == PIN_MODE.I2C:
+            self.__board.set_pin_mode_i2c(read_delay_time=parsed_pin) #I2C doesn't need a pin number so we use the pin parameter as the read_delay_time
         else:
             raise TypeError("type must a value from the PIN_MODE enum")
 
@@ -181,6 +185,32 @@ class Board:
             self.__board.play_tone_off(pin_number=parsed_pin)
         else:
             raise TypeError("type must be one of the WRITE_MODE enum")
+    
+    def i2c_comunication(self, command: I2C_COMMAND, adress, register = None, number_of_bytes = None, args: list = None, callback = None):
+        if command == I2C_COMMAND.READ:
+            if number_of_bytes is None or register is None:
+                raise TypeError("number_of_bytes and register are required to read from i2c")
+            else:
+                self.__board.i2c_read(address=adress, register=register, number_of_bytes=number_of_bytes, callback=callback)
+        elif command == I2C_COMMAND.WRITE:
+            if args is None :
+                raise TypeError("args are required to write to i2c")
+            else:
+                self.__board.i2c_write(address=adress, args=args)
+        elif command == I2C_COMMAND.READ_CONTINUOUS:
+            if number_of_bytes is None or register is None:
+                raise TypeError("number_of_bytes and register are required to read from i2c")
+            else:
+                self.__board.i2c_read_continuous(address=adress, register=register, number_of_bytes=number_of_bytes, callback=callback)
+        elif command == I2C_COMMAND.READ_RESTART_TRANSMISSION:
+            if number_of_bytes is None or register is None:
+                raise TypeError("number_of_bytes and register are required to read from i2c")
+            else:
+                self.__board.i2c_read_restart_transmission(address=adress, register=register, number_of_bytes=number_of_bytes, callback=callback)
+        elif command == I2C_COMMAND.READ_SAVED_DATA:
+            self.__board.i2c_read_saved_data(adress=adress)
+        else:
+            raise TypeError("command must be one of the I2C_COMMAND enum")
     
     @property
     def pymata_board(self):
