@@ -1,7 +1,7 @@
 #Implementation based on the implementation in the example code of the pymata 4 library
 
 from alimata.core.board import Board
-from alimata.core.core import PIN_MODE, I2C_COMMAND
+from alimata.core.core import PIN_MODE, I2C_COMMAND, print_warning
 from alimata.actuators.actuator import Actuator
 from time import sleep
 from enum import Enum
@@ -65,6 +65,12 @@ class Lcd(Actuator):
         the number of cols of the lcd (Read only)
     backlight : bool
         the state of the backlight
+    current_row : int
+        the current row of the cursor
+    current_col : int
+        the current column of the cursor
+    custom_chars : dict
+        the custom characters of the lcd
     
     Methods
     -------
@@ -109,10 +115,16 @@ class Lcd(Actuator):
 
         self.__board = board
 
+        # Constant values
         self.__address = adress
         self.__rows = rows
         self.__cols = cols
         self.__dot_size = dot_size
+
+        # Variables
+        self.__current_row = 0
+        self.__current_col = 0
+        self.__custom_chars = {0: None, 1: None, 2: None, 3: None, 4: None, 5: None, 6: None, 7: None}
 
         self.__backlight = Lcd_COMMAND.LCD_NOBACKLIGHT
         self.__display_function = Lcd_COMMAND.LCD_4BITMODE | Lcd_COMMAND.LCD_1LINE | Lcd_COMMAND.LCD_5x8DOTS
@@ -162,7 +174,7 @@ class Lcd(Actuator):
 
         self.enable_backlight()
 
-        print("LCD : " + str(self.__address) + " started")
+        print("LCD started | adress : " + hex(self.__address))
     
     @property
     def rows_number(self):
@@ -174,6 +186,16 @@ class Lcd(Actuator):
         '''Returns the number of columns of the LCD'''
         return self.__cols
     
+    @property 
+    def current_row(self):
+        '''Returns the current row'''
+        return self.__current_row
+    
+    @property
+    def current_col(self):
+        '''Returns the current column'''
+        return self.__current_col
+
     @property
     def address(self):
         '''Returns the address of the LCD'''
@@ -195,14 +217,19 @@ class Lcd(Actuator):
         else:
             self.disable_backlight()
     
+    @property
+    def get_chars(self):
+        '''Returns the custom chars'''
+        return self.__custom_chars
+    
     def print(self, string: str):
         '''Prints a string on the LCD'''
         for character in string:
             self.__send(ord(character), Lcd_COMMAND.RS)
-            sleep(0.000001)
+            sleep(0.000002)
         else:
             sleep(0.00005)
-        sleep(0.00005)
+        sleep(0.0001)
 
     def clear(self):
         '''Clears the LCD'''
@@ -212,6 +239,10 @@ class Lcd(Actuator):
     def home(self):
         '''Sets the cursor to the home position'''
         self.__command(Lcd_COMMAND.LCD_RETURNHOME)
+
+        self.__current_col = 0
+        self.__current_row = 0
+        
         sleep(0.002)
 
     def set_cursor(self, column: int, row: int):
@@ -220,6 +251,9 @@ class Lcd(Actuator):
         if row > self.__rows:
             row = self.__rows - 1
         self.__command(Lcd_COMMAND.LCD_SETDDRAMADDR | (column + row_offsets[row]))
+
+        self.__current_col = column
+        self.__current_row = row
 
     def disable_display(self):
         '''Disables the display'''
@@ -288,9 +322,44 @@ class Lcd(Actuator):
         '''Enables the backlight'''
         self.__backlight = Lcd_COMMAND.LCD_BACKLIGHT
         self.__i2c_write(0)
+    
+    def creat_char(self, id: int, charmap: list):
+        '''Creates a custom character (id 0-7, charmap 8 bytes)'''
+        if id < 0 or id > 7:
+            raise ValueError('id must be between 0 and 7')
+        elif self.__custom_chars[id] is not None:
+            print_warning('Overwriting custom character with id {}'.format(id))
+        
+        self.__custom_chars[id] = charmap
+
+        id %= 8
+
+        self.__command(Lcd_COMMAND.LCD_SETCGRAMADDR | (id << 3))
+
+        sleep(0.00005)
+
+        for i in charmap:
+            self.__send(i, Lcd_COMMAND.RS)
+        
+        self.set_cursor(0, 0) # Set cursor to home position
+
+        sleep(0.00005)
+
+        self.set_cursor(self.__current_col, self.__current_row) # Set cursor to previous position
+    
+    def print_char(self, id: int):
+        '''Prints a custom character (id 0-7)'''
+        if id > 7 or id < 0:
+            raise ValueError('id must be between 0 and 7')
+        elif self.__custom_chars[id] is None:
+            raise ValueError('Custom character with id {} does not exist, creat a new char with the creat_char() function'.format(id))
+        else:
+            self.__write_4_bits(Lcd_COMMAND.RS | (id & 0xF0))
+            self.__write_4_bits(Lcd_COMMAND.RS | ((id << 4) & 0xF0))
 
     def __command(self, value):
         self.__send(value, 0)
+        sleep(0.00005)
 
     def __send(self, value: int, mode: int):
         high_bits: int = value & 0b11110000
@@ -310,5 +379,4 @@ class Lcd(Actuator):
         sleep(0.00005)
 
     def __i2c_write(self, data: int):
-        # TODO: Debug the self.__board.i2c_comunication() 
-        self.__board.pymata_board.i2c_write(self.__address, [data, self.__backlight])
+        self.__board.i2c_comunication(I2C_COMMAND.WRITE, self.address, args=[data | self.__backlight])
