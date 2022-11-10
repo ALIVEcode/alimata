@@ -74,6 +74,10 @@ class Lcd(Actuator):
     
     Methods
     -------
+    print(string: str)
+        Prints a string on the LCD at the current position
+    quick_print(ligne1: str, ligne2: str = "", ligne3: str = "", ligne4: str = "")
+        Quickly prints 1 to 4 lines on the LCD
     clear()
         Clears the lcd
     home()
@@ -223,13 +227,24 @@ class Lcd(Actuator):
         return self.__custom_chars
     
     def print(self, string: str):
-        '''Prints a string on the LCD'''
+        '''Prints a string on the LCD at the current position'''
         for character in string:
             self.__send(ord(character), Lcd_COMMAND.RS)
             sleep(0.000002)
         else:
             sleep(0.00005)
         sleep(0.0001)
+    
+    def quick_print(self, ligne1: str, ligne2: str = "", ligne3: str = "", ligne4: str = ""):
+        '''Quickly prints 1 to 4 lines on the LCD'''
+        self.home()
+        self.print(ligne1)
+        self.set_cursor(0, 1)
+        self.print(ligne2)
+        self.set_cursor(0, 2)
+        self.print(ligne3)
+        self.set_cursor(0, 3)
+        self.print(ligne4)
 
     def clear(self):
         '''Clears the LCD'''
