@@ -178,6 +178,8 @@ class Lcd(Actuator):
 
         self.enable_backlight()
 
+        sleep(2) # wait for the lcd to be ready
+
         print("LCD started | adress : " + hex(self.__address))
     
     @property
@@ -252,7 +254,7 @@ class Lcd(Actuator):
     def clear(self):
         '''Clears the LCD'''
         self.__command(Lcd_COMMAND.LCD_CLEARDISPLAY)
-        sleep(0.002)
+        sleep(0.005)
 
     def home(self):
         '''Sets the cursor to the home position'''
