@@ -3,6 +3,8 @@ from alimata.core.board import Board
 from alimata.actuators.stepper import Stepper
 from time import sleep
 
+raise NotImplementedError("Stepper not implemented yet")
+
 # Create a board object
 board = Board()
 
