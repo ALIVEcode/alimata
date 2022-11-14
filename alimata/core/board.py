@@ -102,7 +102,7 @@ class Board:
         return int(pin)
 
 
-    def set_pin_mode(self, pin: Union[str, int, list], type_: PIN_MODE, callback=None, dht_type: Optional[DHT_TYPE] = None, timeout=80000, differential: int = 1, min_pulse: int = 544, max_pulse:int =2400, steps_per_revolution: Optional[int] = None):
+    def set_pin_mode(self, pin: Union[str, int, list], type_: PIN_MODE, callback=None, dht_type: Optional[DHT_TYPE] = None, differential: int = 0, min_pulse: int = 544, max_pulse:int =2400, steps_per_revolution: Optional[int] = None):
         parsed_pin = self.parse_pin_number(pin=pin, type_=type_)
         
         if type_ == PIN_MODE.DIGITAL_INPUT:
@@ -125,7 +125,7 @@ class Board:
                 raise TypeError("dht_type is required to setup a dht")
             self.__board.set_pin_mode_dht(pin_number=parsed_pin, callback=callback, sensor_type=dht_type)
         elif type_ == PIN_MODE.SERVO:
-            self.__board.set_pin_mode_servo(oin=parsed_pin, min_pulse=min_pulse, max_pulse=max_pulse)
+            self.__board.set_pin_mode_servo(pin_number=parsed_pin, min_pulse=min_pulse, max_pulse=max_pulse)
         elif type_ == PIN_MODE.STEPPER:
             if type(parsed_pin) is not list:
                 raise TypeError("pin must be a list of 2 or 4 pins")
