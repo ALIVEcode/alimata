@@ -6,6 +6,8 @@ from typing import Union, Optional
 class Stepper(Actuator):
     
     def __init__(self, board: Board, steps_per_revolution: int, pin1: Union[str, int], pin2: Union[str, int], pin3: Optional[Union[str, int]] = None, pin4:  Optional[Union[str, int]] = None, speed: int = 5):
+        raise NotImplementedError("Stepper not implemented yet")
+
         
         if pin3 is None and pin4 is None:
             pin_ = [pin1, pin2]

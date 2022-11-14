@@ -114,8 +114,8 @@ class Lcd(Actuator):
 
     def __init__(self, board: Board, adress, cols: int, rows: int, dot_size: int = 0):
 
-        self.__read_delay = 0
-        super().__init__(board=board, pin=self.__read_delay, type_=PIN_MODE.I2C)
+        self.__i2c_port = 0
+        super().__init__(board=board, pin=self.__i2c_port, type_=PIN_MODE.I2C)
 
         self.__board = board
 

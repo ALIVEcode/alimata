@@ -1,6 +1,6 @@
 from alimata.core.core import DHT_TYPE, PIN_MODE, WRITE_MODE, I2C_COMMAND, print_warning
 from alimata.core.error import AlimataUnexpectedPin
-from pymata4 import pymata4
+from firmetix import firmetix
 from typing import Optional, Union
 import sys, datetime
 
@@ -35,14 +35,12 @@ class Board:
     """
 
     def __init__(self, board_id: int = 1, COM_port=None):
-        self.__board = pymata4.Pymata4(arduino_instance_id=board_id, com_port=COM_port, arduino_wait=2)
+        self.__board = firmetix.Frimetix(arduino_instance_id=board_id, com_port=COM_port, arduino_wait=2)
         self.__board_id = board_id
         self.__is_started = False
 
         self.__setup_func = None
         self.__loop_func = None
-
-        self.__num_of_digital_pins = len(self.__board.digital_pins)
 
     
     def __main(self):
@@ -93,8 +91,6 @@ class Board:
         if type(pin) == str:
             if pin.startswith("A"): #Check if it's an analog pin
                 pin = int(pin[1:]) #Strip the A from the pin name
-                if type_ != PIN_MODE.ANALOG_INPUT:
-                    pin = int(pin) + self.__num_of_digital_pins
         elif type(pin) == list:
             mapped_pin = pin.copy()
             for i in range(len(pin)):
@@ -118,16 +114,16 @@ class Board:
         elif type_ == PIN_MODE.ANALOG_INPUT:
             self.__board.set_pin_mode_analog_input(pin_number=parsed_pin, differential=differential, callback=callback)
         elif type_ == PIN_MODE.ANALOG_OUTPUT:
-            self.__board.set_pin_mode_pwm_output(pin_number=parsed_pin)
+            self.__board.set_pin_mode_analog_output(pin_number=parsed_pin)
         elif type_ == PIN_MODE.SONAR:
             if type(parsed_pin) is not list:
                 raise TypeError("pin must be a list (trigger_pin, echo_pin)")
             else:
-                self.__board.set_pin_mode_sonar(trigger_pin=parsed_pin[0], echo_pin=parsed_pin[1], callback=callback, timeout=timeout)
+                self.__board.set_pin_mode_sonar(trigger_pin=parsed_pin[0], echo_pin=parsed_pin[1], callback=callback)
         elif type_ == PIN_MODE.DHT:
             if dht_type is None:
                 raise TypeError("dht_type is required to setup a dht")
-            self.__board.set_pin_mode_dht(pin_number=parsed_pin, callback=callback, sensor_type=dht_type, differential=differential)
+            self.__board.set_pin_mode_dht(pin_number=parsed_pin, callback=callback, sensor_type=dht_type)
         elif type_ == PIN_MODE.SERVO:
             self.__board.set_pin_mode_servo(oin=parsed_pin, min_pulse=min_pulse, max_pulse=max_pulse)
         elif type_ == PIN_MODE.STEPPER:
@@ -136,11 +132,11 @@ class Board:
             elif steps_per_revolution is None:
                 raise TypeError("steps_per_revolution is required to setup a stepper")
             else:
-                self.__board.set_pin_mode_stepper(steps_per_revolution=steps_per_revolution, stepper_pins=parsed_pin)
+                raise NotImplementedError("Stepper not implemented yet")
         elif type_ == PIN_MODE.TONE:
             self.__board.set_pin_mode_tone(pin_number=parsed_pin)
         elif type_ == PIN_MODE.I2C:
-            self.__board.set_pin_mode_i2c(read_delay_time=parsed_pin) #I2C doesn't need a pin number so we use the pin parameter as the read_delay_time
+            self.__board.set_pin_mode_i2c(i2c_port=parsed_pin) #I2C doesn't need a pin number so we use the pin parameter as the i2c port so 0 or 1
         else:
             raise TypeError("type must a value from the PIN_MODE enum")
 
@@ -152,13 +148,13 @@ class Board:
         # Analog OUTPUT
         if type_ == WRITE_MODE.ANALOG:
             if value >= 0 or value <= 255:
-                self.__board.pwm_write(pin=parsed_pin, value=value)
+                self.__board.analog_write(pin=parsed_pin, value=value)
             elif value > 255:
                 print_warning("Value is greater than 255, setting value to 255")
-                self.__board.pwm_write(pin=parsed_pin, value=255)
+                self.__board.analog_write(pin=parsed_pin, value=255)
             elif value < 0:
                 print_warning("Value is less than 0, setting value to 0")
-                self.__board.pwm_write(pin=parsed_pin, value=0)
+                self.__board.analog_write(pin=parsed_pin, value=0)
 
         # Digital OUTPUT
         elif type_ == WRITE_MODE.DIGITAL:
@@ -172,43 +168,36 @@ class Board:
             if number_of_steps is None:
                 raise TypeError("number_of_steps is required to write to a stepper")
             else:
-                self.__board.stepper_write(motor_speed=value, number_of_steps=number_of_steps)
+                raise NotImplementedError("Stepper not implemented yet")
 
         # Tone Duration OUTPUT
         elif type_ == WRITE_MODE.TONE:
             if duration is None:
                 raise TypeError("duration (in ms) is required for tone")
-            self.__board.play_tone(pin_number=parsed_pin, frequency=value, duration=duration)
+            self.__board.tone(pin_number=parsed_pin, frequency=value, duration=duration)
         elif type_ == WRITE_MODE.TONE_CONTINUOUS:
-            self.__board.play_tone_continuously(pin_number=parsed_pin, frequency=value)
+            self.__board.tone(pin_number=parsed_pin, frequency=value)
         elif type_ == WRITE_MODE.TONE_STOP:
-            self.__board.play_tone_off(pin_number=parsed_pin)
+            self.__board.no_tone(pin_number=parsed_pin)
         else:
             raise TypeError("type must be one of the WRITE_MODE enum")
     
-    def i2c_comunication(self, command: I2C_COMMAND, adress, register = None, number_of_bytes = None, args: list = None, callback = None):
+    def i2c_comunication(self, command: I2C_COMMAND, adress, i2c_port: int = 0, register = None, number_of_bytes = None, args: list = None, callback = None):
         if command == I2C_COMMAND.READ:
             if number_of_bytes is None or register is None:
                 raise TypeError("number_of_bytes and register are required to read from i2c")
             else:
-                self.__board.i2c_read(address=adress, register=register, number_of_bytes=number_of_bytes, callback=callback)
+                self.__board.i2c_read(address=adress, register=register, number_of_bytes=number_of_bytes, callback=callback, i2c_port=i2c_port)
         elif command == I2C_COMMAND.WRITE:
             if args is None :
                 raise TypeError("args are required to write to i2c")
             else:
-                self.__board.i2c_write(address=adress, args=args)
-        elif command == I2C_COMMAND.READ_CONTINUOUS:
-            if number_of_bytes is None or register is None:
-                raise TypeError("number_of_bytes and register are required to read from i2c")
-            else:
-                self.__board.i2c_read_continuous(address=adress, register=register, number_of_bytes=number_of_bytes, callback=callback)
+                self.__board.i2c_write(address=adress, args=args, i2c_port=i2c_port)
         elif command == I2C_COMMAND.READ_RESTART_TRANSMISSION:
             if number_of_bytes is None or register is None:
                 raise TypeError("number_of_bytes and register are required to read from i2c")
             else:
-                self.__board.i2c_read_restart_transmission(address=adress, register=register, number_of_bytes=number_of_bytes, callback=callback)
-        elif command == I2C_COMMAND.READ_SAVED_DATA:
-            self.__board.i2c_read_saved_data(adress=adress)
+                self.__board.i2c_read_restart_transmission(address=adress, register=register, number_of_bytes=number_of_bytes, callback=callback, i2c_port=i2c_port)
         else:
             raise TypeError("command must be one of the I2C_COMMAND enum")
     
