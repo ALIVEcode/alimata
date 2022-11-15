@@ -47,30 +47,37 @@ class Board:
         # start the setup function
         self.__setup_func()
 
-        self.__is_started = True
-
         # loop the loop function
         while self.__is_started:
             self.__loop_func()
 
-    def start(self, setup_func, loop_func):
+    def start(self, setup_func = None, loop_func = None):
         if self.__is_started == True:
             print_warning("Board is already started, not starting again")
             return
-        else:
-
+        elif setup_func is not None and loop_func is not None:
+            
             # saving the functions
             self.__setup_func = setup_func
             self.__loop_func = loop_func
 
 
             try:
+                    
+                self.__is_started = True
+                print("Board started")
+                
                 # start the main function
                 self.__main()
 
             except (KeyboardInterrupt, RuntimeError) as e:
                 self.shutdown()
                 sys.exit(0)
+        elif setup_func is None or loop_func is None:
+            raise TypeError("Both setup_func and loop_func must be defined or none of them")
+        else:
+            self.__is_started = True
+            print("Board started")
 
     def is_started(self):
         return self.__is_started
