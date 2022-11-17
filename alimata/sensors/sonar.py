@@ -28,7 +28,7 @@ class Sonar(Sensor):
 
         pin_ = [trigger_pin, echo_pin]
 
-        super().__init__(board=board, pin=pin_, on_change=on_change, type_=PIN_MODE.SONAR, timeout=timeout)
+        super().__init__(board=board, pin=pin_, on_change=on_change, type_=PIN_MODE.SONAR)
 
         self.__data = None
 

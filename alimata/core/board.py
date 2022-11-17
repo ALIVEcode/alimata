@@ -98,6 +98,8 @@ class Board:
         if type(pin) == str:
             if pin.startswith("A"): #Check if it's an analog pin
                 pin = int(pin[1:]) #Strip the A from the pin name
+            else:
+                pin = int(pin)
         elif type(pin) == list:
             mapped_pin = pin.copy()
             for i in range(len(pin)):
@@ -130,7 +132,7 @@ class Board:
         elif type_ == PIN_MODE.DHT:
             if dht_type is None:
                 raise TypeError("dht_type is required to setup a dht")
-            self.__board.set_pin_mode_dht(pin_number=parsed_pin, callback=callback, sensor_type=dht_type)
+            self.__board.set_pin_mode_dht(pin=parsed_pin, callback=callback, dht_type=dht_type)
         elif type_ == PIN_MODE.SERVO:
             self.__board.set_pin_mode_servo(pin_number=parsed_pin, min_pulse=min_pulse, max_pulse=max_pulse)
         elif type_ == PIN_MODE.STEPPER:
