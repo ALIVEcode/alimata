@@ -21,7 +21,7 @@ class Board:
         Starting the board : (setup_func, loop_func)
     is_started : bool
         Retuns if the board is started or not (read only)
-    pymata_board : telemetrix
+    firmetix_board : telemetrix
         The telemetrix board object (read only)
     set_pin_mode : function
         Setting the pin mode : (pin, type, callback=None, differential=1, echo_pin=None, min_pulse=544, max_pulse=2400)
@@ -98,6 +98,8 @@ class Board:
         if type(pin) == str:
             if pin.startswith("A"): #Check if it's an analog pin
                 pin = int(pin[1:]) #Strip the A from the pin name
+                if type_ != PIN_MODE.ANALOG_INPUT:
+                    pin = pin + self.firmetix_board.first_analog_pin # If it's not an analog input, convert the pin to a digital pin
             else:
                 pin = int(pin)
         elif type(pin) == list:
@@ -132,7 +134,7 @@ class Board:
         elif type_ == PIN_MODE.DHT:
             if dht_type is None:
                 raise TypeError("dht_type is required to setup a dht")
-            self.__board.set_pin_mode_dht(pin=parsed_pin, callback=callback, dht_type=dht_type)
+            self.__board.set_pin_mode_dht(pin_number=parsed_pin, callback=callback, dht_type=dht_type)
         elif type_ == PIN_MODE.SERVO:
             self.__board.set_pin_mode_servo(pin_number=parsed_pin, min_pulse=min_pulse, max_pulse=max_pulse)
         elif type_ == PIN_MODE.STEPPER:
@@ -211,5 +213,5 @@ class Board:
             raise TypeError("command must be one of the I2C_COMMAND enum")
     
     @property
-    def pymata_board(self):
+    def firmetix_board(self):
         return self.__board
