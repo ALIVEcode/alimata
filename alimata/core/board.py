@@ -1,4 +1,4 @@
-from alimata.core.core import DHT_TYPE, PIN_MODE, WRITE_MODE, I2C_COMMAND, print_warning
+from alimata.core.core import DHT_TYPE, PIN_MODE, WRITE_MODE, I2C_COMMAND, SPI_COMMAND, print_warning
 from alimata.core.error import AlimataUnexpectedPin
 from firmetix import firmetix
 from typing import Optional, Union
@@ -148,6 +148,8 @@ class Board:
             self.__board.set_pin_mode_tone(pin_number=parsed_pin)
         elif type_ == PIN_MODE.I2C:
             self.__board.set_pin_mode_i2c(i2c_port=parsed_pin) #I2C doesn't need a pin number so we use the pin parameter as the i2c port so 0 or 1
+        elif type_ == PIN_MODE.SPI:
+            self.__board.set_pin_mode_spi(chip_select_list=parsed_pin)
         else:
             raise TypeError("type must a value from the PIN_MODE enum")
 
@@ -211,6 +213,26 @@ class Board:
                 self.__board.i2c_read_restart_transmission(address=adress, register=register, number_of_bytes=number_of_bytes, callback=callback, i2c_port=i2c_port)
         else:
             raise TypeError("command must be one of the I2C_COMMAND enum")
+    
+    def spi_commuinication(self, command: SPI_COMMAND, cs_pin : Union[int,str], _bytes: list = None, register = None, number_of_bytes = None, callback = None):
+        parsed_cs_pin = self.parse_pin_number(pin=cs_pin, type_=PIN_MODE.SPI)
+        self.__board.spi_cs_control(cs_pin=parsed_cs_pin, state=0) #Select the device
+
+        if command == SPI_COMMAND.WRITE_BLOCKING:
+            if _bytes is None:
+                raise TypeError("bytes are required to write to spi")
+            self.__board.spi_write_blocking(_bytes)
+        elif command == SPI_COMMAND.READ_BLOCKING:
+            if number_of_bytes is None:
+                raise TypeError("number_of_bytes is required to read from spi")
+            if register is None:
+                raise TypeError("register is required to read from spi")
+            self.__board.spi_read_blocking(register_selection=register, number_of_bytes=number_of_bytes, call_back=callback)
+        elif command == SPI_COMMAND.SET_FORMAT:
+            #TODO: Implement this
+            raise NotImplementedError("SPI set format not implemented yet")
+            
+        self.__board.spi_cs_control(cs_pin=parsed_cs_pin, state=1) #Deselect the device
     
     @property
     def firmetix_board(self):

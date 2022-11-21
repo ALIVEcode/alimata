@@ -37,6 +37,7 @@ class PIN_MODE(str, Enum):
     STEPPER = "STEPPER"
     TONE = "TONE"
     I2C = "I2C"
+    SPI = "SPI"
 
 class WRITE_MODE(str, Enum):
     ANALOG = "ANALOG"
@@ -57,3 +58,7 @@ class I2C_COMMAND(str, Enum):
     READ_RESTART_TRANSMISSION = "READ_RESTART_TRANSMISSION"
     WRITE = "WRITE"
 
+class SPI_COMMAND(str, Enum):
+    READ_BLOCKING = "READ_BLOCKING"
+    WRITE_BLOCKING = "WRITE_BLOCKING"
+    SET_FORMAT = "SET_FORMAT"
