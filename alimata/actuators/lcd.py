@@ -129,6 +129,7 @@ class Lcd(Actuator):
         self.__current_row = 0
         self.__current_col = 0
         self.__custom_chars = {0: None, 1: None, 2: None, 3: None, 4: None, 5: None, 6: None, 7: None}
+        self.__writing = False
 
         self.__backlight = Lcd_COMMAND.LCD_NOBACKLIGHT
         self.__display_function = Lcd_COMMAND.LCD_4BITMODE | Lcd_COMMAND.LCD_1LINE | Lcd_COMMAND.LCD_5x8DOTS
@@ -232,13 +233,20 @@ class Lcd(Actuator):
         '''Prints a string on the LCD at the current position (or at the specified position)'''
         if col is not None and row is not None:
             self.set_cursor(col, row)
-        
+        if self.__writing:
+            self.__writing = False
+            print_warning("LCD print overwriten")
+            sleep(0.1)
+        self.__writing = True
         for character in string:
+            if not self.__writing:
+                break
             self.__send(ord(character), Lcd_COMMAND.RS)
             sleep(0.000002)
         else:
             sleep(0.00005)
         sleep(0.0001)
+        self.__writing = False
     
     def quick_print(self, ligne1: str, ligne2: str = "", ligne3: str = "", ligne4: str = ""):
         '''Quickly prints 1 to 4 lines on the LCD'''
@@ -253,6 +261,7 @@ class Lcd(Actuator):
 
     def clear(self):
         '''Clears the LCD'''
+        self.__writing = False
         self.__command(Lcd_COMMAND.LCD_CLEARDISPLAY)
         sleep(0.005)
 
