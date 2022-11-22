@@ -176,7 +176,7 @@ class Board:
             else:
                 self.__board.digital_write(pin=parsed_pin, value=value)
         elif type_ == WRITE_MODE.SERVO:
-            self.__board.servo_write(pin=parsed_pin, value=value)
+            self.__board.servo_write(pin_number=parsed_pin, value=value)
         elif type_ == WRITE_MODE.STEPPER:
             if number_of_steps is None:
                 raise TypeError("number_of_steps is required to write to a stepper")
@@ -231,7 +231,7 @@ class Board:
         elif command == SPI_COMMAND.SET_FORMAT:
             #TODO: Implement this
             raise NotImplementedError("SPI set format not implemented yet")
-            
+
         self.__board.spi_cs_control(cs_pin=parsed_cs_pin, state=1) #Deselect the device
     
     @property
