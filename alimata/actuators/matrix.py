@@ -36,16 +36,16 @@ class Matrix(Actuator):
 
         if column + 1 > 8:
             raise ValueError("Column must be between 1 and 8")
-        data = MATRIX_COMMAND.SCAN_LIMIT << 8 | column
-        self.board.spi_commuinication(cs_pin=cs_pin, command=SPI_COMMAND.WRITE_BLOCKING, bytes=[data])
+        data = [MATRIX_COMMAND.SCAN_LIMIT, column]
+        self.board.spi_commuinication(cs_pin=cs_pin, command=SPI_COMMAND.WRITE_BLOCKING, bytes=data)
 
         #Set decode mode to 0
-        data = MATRIX_COMMAND.DECODE << 8 | 0x00
-        self.board.spi_commuinication(cs_pin=cs_pin, command=SPI_COMMAND.WRITE_BLOCKING, bytes=[data])
+        data = [MATRIX_COMMAND.DECODE, 0x00]
+        self.board.spi_commuinication(cs_pin=cs_pin, command=SPI_COMMAND.WRITE_BLOCKING, bytes=data)
 
         #set display test to 0
-        data = MATRIX_COMMAND.DISPLAY_TEST << 8 | 0x00
-        self.board.spi_commuinication(cs_pin=cs_pin, command=SPI_COMMAND.WRITE_BLOCKING, bytes=[data])
+        data = [MATRIX_COMMAND.DISPLAY_TEST, 0x00]
+        self.board.spi_commuinication(cs_pin=cs_pin, command=SPI_COMMAND.WRITE_BLOCKING, bytes=data)
 
     def draw(self, col: int, row: int, value: int):
         if col > self.__column + 1:
@@ -56,22 +56,22 @@ class Matrix(Actuator):
             raise ValueError("Value must be 0 or 1")
         
         if col == 1:
-            data = MATRIX_COMMAND.DIGIT0 << 8 | value << row
+            data = [MATRIX_COMMAND.DIGIT0, value << row]
         elif col == 2:
-            data = MATRIX_COMMAND.DIGIT1 << 8 | value << row
+            data = [MATRIX_COMMAND.DIGIT1, value << row]
         elif col == 3:
-            data = MATRIX_COMMAND.DIGIT2 << 8 | value << row
+            data = [MATRIX_COMMAND.DIGIT2, value << row]
         elif col == 4:
-            data = MATRIX_COMMAND.DIGIT3 << 8 | value << row
+            data = [MATRIX_COMMAND.DIGIT3, value << row]
         elif col == 5:
-            data = MATRIX_COMMAND.DIGIT4 << 8 | value << row
+            data = [MATRIX_COMMAND.DIGIT4, value << row]
         elif col == 6:
-            data = MATRIX_COMMAND.DIGIT5 << 8 | value << row
+            data = [MATRIX_COMMAND.DIGIT5, value << row]
         elif col == 7:
-            data = MATRIX_COMMAND.DIGIT6 << 8 | value << row
+            data = [MATRIX_COMMAND.DIGIT6, value << row]
         elif col == 8:
-            data = MATRIX_COMMAND.DIGIT7 << 8 | value << row
-        self.board.spi_commuinication(cs_pin=self.__cs_pin, command=SPI_COMMAND.WRITE_BLOCKING, bytes=[data])
+            data = [MATRIX_COMMAND.DIGIT7, value << row]
+        self.board.spi_commuinication(cs_pin=self.__cs_pin, command=SPI_COMMAND.WRITE_BLOCKING, bytes=data)
 
 
     @property
@@ -85,5 +85,5 @@ class Matrix(Actuator):
             print_warning("Intensity > 15, setting to 15")
             value = 15
         self.__intensity = value
-        data = MATRIX_COMMAND.INTENSITY << 8 | value
-        self.board.spi_commuinication(cs_pin=self.__cs_pin, command=SPI_COMMAND.WRITE_BLOCKING, bytes=[data])
+        data = [MATRIX_COMMAND.INTENSITY, value]
+        self.board.spi_commuinication(cs_pin=self.__cs_pin, command=SPI_COMMAND.WRITE_BLOCKING, bytes=data)
