@@ -176,7 +176,7 @@ class Board:
             else:
                 self.__board.digital_write(pin=parsed_pin, value=value)
         elif type_ == WRITE_MODE.SERVO:
-            self.__board.servo_write(pin_number=parsed_pin, value=value)
+            self.__board.servo_write(pin_number=parsed_pin, angle=value)
         elif type_ == WRITE_MODE.STEPPER:
             if number_of_steps is None:
                 raise TypeError("number_of_steps is required to write to a stepper")
