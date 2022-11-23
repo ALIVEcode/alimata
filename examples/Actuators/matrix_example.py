@@ -4,11 +4,11 @@ import time
 
 board = Board()
 
-matrix = Matrix(board=board, cs_pin=0, row=8, column=8)
+matrix = Matrix(board=board, cs_pin=10, row=8, column=8)
 
 def setup():
-    for i in range(8):
-        for j in range(8):
+    for i in range(1,8):
+        for j in range(1,8):
             matrix.draw(col=i, row=j, value=1)
             print("i: {}, j: {}".format(i, j))
             time.sleep(0.5)

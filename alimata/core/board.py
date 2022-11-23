@@ -216,8 +216,8 @@ class Board:
     
     def spi_commuinication(self, command: SPI_COMMAND, cs_pin : Union[int,str], _bytes: list = None, register = None, number_of_bytes = None, callback = None):
         parsed_cs_pin = self.parse_pin_number(pin=cs_pin, type_=PIN_MODE.SPI)
-        self.__board.spi_cs_control(cs_pin=parsed_cs_pin, state=0) #Select the device
-
+        self.__board.spi_cs_control(chip_select_pin=parsed_cs_pin, select=0) #Select the device
+        
         if command == SPI_COMMAND.WRITE_BLOCKING:
             if _bytes is None:
                 raise TypeError("bytes are required to write to spi")
@@ -232,7 +232,7 @@ class Board:
             #TODO: Implement this
             raise NotImplementedError("SPI set format not implemented yet")
 
-        self.__board.spi_cs_control(cs_pin=parsed_cs_pin, state=1) #Deselect the device
+        self.__board.spi_cs_control(chip_select_pin=parsed_cs_pin, select=1) #Deselect the device
     
     @property
     def firmetix_board(self):
