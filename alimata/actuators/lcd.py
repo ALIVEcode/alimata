@@ -152,16 +152,16 @@ class Lcd(Actuator):
         sleep(1)
 
         # put the LCD into 4 bit mode
-        self.__write_4_bits(0b110000)
+        self.__send(0b110000, 0, True)
         sleep(0.0045)
 
-        self.__write_4_bits(0b110000)
+        self.__send(0b110000, 0, True)
         sleep(0.0045)
 
-        self.__write_4_bits(0b110000)
+        self.__send(0b110000, 0, True)
         sleep(0.00015)
 
-        self.__write_4_bits(0b100000)
+        self.__send(0b100000, 0, True)
 
         # set # lines, font size, etc.
 
@@ -383,29 +383,28 @@ class Lcd(Actuator):
         elif self.__custom_chars[id] is None:
             raise ValueError('Custom character with id {} does not exist, creat a new char with the creat_char() function'.format(id))
         else:
-            self.__write_4_bits(Lcd_COMMAND.RS | (id & 0xF0))
-            self.__write_4_bits(Lcd_COMMAND.RS | ((id << 4) & 0xF0))
+            self.__send(id, Lcd_COMMAND.RS)
 
     def __command(self, value):
         self.__send(value, 0)
-        sleep(0.00005)
-
-    def __send(self, value: int, mode: int):
-        high_bits: int = value & 0b11110000
-        low_bits: int = (value << 4) & 0b11110000
-        self.__write_4_bits(high_bits | mode)
-        self.__write_4_bits(low_bits | mode)
-
-    def __write_4_bits(self, value: int):
-        self.__i2c_write(value)
-        self.__pulse_enable(value)
-
-    def __pulse_enable(self, data: int):
-        self.__i2c_write(data | Lcd_COMMAND.EN)
         sleep(0.000001)
 
-        self.__i2c_write(data &~ Lcd_COMMAND.EN)
-        sleep(0.00005)
+    def __send(self, value: int, mode: int, init: bool = False):
+        '''Sends a value to the LCD mode (0, 1 = regerister select)'''
+        high_bits: int = value & 0b11110000
+        low_bits: int = (value << 4) & 0b11110000
+
+        self.__i2c_write(high_bits | mode | Lcd_COMMAND.EN)
+        sleep(0.000001)
+        self.__i2c_write(high_bits | mode)
+
+        if not init: # init only need half bits
+
+            sleep(0.00004)
+
+            self.__i2c_write(low_bits | mode | Lcd_COMMAND.EN)
+            sleep(0.000001)
+            self.__i2c_write(low_bits | mode)
 
     def __i2c_write(self, data: int):
         self.__board.i2c_comunication(I2C_COMMAND.WRITE, self.address, args=[data | self.__backlight])
