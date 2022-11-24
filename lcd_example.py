@@ -29,11 +29,15 @@ def setup():
     lcd.set_cursor(1, 3)
     lcd.print("Waiting 5 seconds")
     
-    sleep(5)
+    for i in range(5):
+        lcd.set_cursor(0, 3)
+        lcd.print("Waiting {} seconds".format(5-i))
+        sleep(1)
 
     print("Clearing")
     lcd.clear()
     lcd.quick_print("Hello World 1", "Hello World 2", "Hello World 3", "Hello World 4")
+
 
 def loop():
     pass

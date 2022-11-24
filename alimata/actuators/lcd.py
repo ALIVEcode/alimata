@@ -153,13 +153,13 @@ class Lcd(Actuator):
 
         # put the LCD into 4 bit mode
         self.__send(0b110000, 0, True)
-        sleep(0.0045)
+        sleep(0.045)
 
         self.__send(0b110000, 0, True)
-        sleep(0.0045)
+        sleep(0.15)
 
         self.__send(0b110000, 0, True)
-        sleep(0.00015)
+        sleep(0.045)
 
         self.__send(0b100000, 0, True)
 
@@ -397,7 +397,7 @@ class Lcd(Actuator):
         self.__i2c_write(high_bits | mode | Lcd_COMMAND.EN)
         sleep(0.000001)
         self.__i2c_write(high_bits | mode)
-
+        sleep(0.00001)
         if not init: # init only need half bits
 
             sleep(0.00004)
