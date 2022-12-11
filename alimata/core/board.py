@@ -1,5 +1,5 @@
 from alimata.core.core import DHT_TYPE, PIN_MODE, WRITE_MODE, I2C_COMMAND, SPI_COMMAND, print_warning
-from alimata.core.error import AlimataUnexpectedPin
+from alimata.core.error import AlimataUnexpectedPin, AlimataUnexpectedPinMode, AlimataUnexpectedWriteMode, AlimataUnexpectedValue, AlimataUnexpectedI2cCommand, AlimataExpectedValue
 from firmetix import firmetix
 from typing import Optional, Union
 import sys, datetime
@@ -100,14 +100,16 @@ class Board:
                 pin = int(pin[1:]) #Strip the A from the pin name
                 if type_ != PIN_MODE.ANALOG_INPUT:
                     pin = pin + self.firmetix_board.first_analog_pin # If it's not an analog input, convert the pin to a digital pin
-            else:
+            elif pin.isdigit():
                 pin = int(pin)
+            else:
+                raise AlimataUnexpectedPin("The pin must either be in an int (1, 2, 3 ...) or a string (A1, A2, A3 ...)")   
         elif type(pin) == list:
             mapped_pin = pin.copy()
             for i in range(len(pin)):
                 mapped_pin[i] = self.parse_pin_number(pin[i], type_)
             return mapped_pin
-            
+        
         if type(pin) is not int:
             raise AlimataUnexpectedPin("The pin must either be in an int (1, 2, 3 ...) or a string (A1, A2, A3 ...)")
         return int(pin)
@@ -128,20 +130,20 @@ class Board:
             self.__board.set_pin_mode_analog_output(pin_number=parsed_pin)
         elif type_ == PIN_MODE.SONAR:
             if type(parsed_pin) is not list:
-                raise TypeError("pin must be a list (trigger_pin, echo_pin)")
+                raise AlimataUnexpectedPin("pin must be a list (trigger_pin, echo_pin)")
             else:
                 self.__board.set_pin_mode_sonar(trigger_pin=parsed_pin[0], echo_pin=parsed_pin[1], callback=callback)
         elif type_ == PIN_MODE.DHT:
             if dht_type is None:
-                raise TypeError("dht_type is required to setup a dht")
+                raise AlimataExpectedValue("dht_type is required to setup a dht")
             self.__board.set_pin_mode_dht(pin_number=parsed_pin, callback=callback, dht_type=dht_type)
         elif type_ == PIN_MODE.SERVO:
             self.__board.set_pin_mode_servo(pin_number=parsed_pin, min_pulse=min_pulse, max_pulse=max_pulse)
         elif type_ == PIN_MODE.STEPPER:
             if type(parsed_pin) is not list:
-                raise TypeError("pin must be a list of 2 or 4 pins")
+                raise AlimataUnexpectedPin("pin must be a list of 2 or 4 pins")
             elif steps_per_revolution is None:
-                raise TypeError("steps_per_revolution is required to setup a stepper")
+                raise AlimataExpectedValue("steps_per_revolution is required to setup a stepper")
             else:
                 raise NotImplementedError("Stepper not implemented yet")
         elif type_ == PIN_MODE.TONE:
@@ -151,7 +153,7 @@ class Board:
         elif type_ == PIN_MODE.SPI:
             self.__board.set_pin_mode_spi(chip_select_list=parsed_pin)
         else:
-            raise TypeError("type must a value from the PIN_MODE enum")
+            raise AlimataUnexpectedPinMode("pin mode must be from the PIN_MODE enum")
 
         
     # Use PWM for analog write
@@ -172,47 +174,47 @@ class Board:
         # Digital OUTPUT
         elif type_ == WRITE_MODE.DIGITAL:
             if value not in [0, 1]:
-                raise TypeError("value must be equal to 0 or 1")
+                raise AlimataUnexpectedValue("value for write mode digital must be equal to 0 or 1")
             else:
                 self.__board.digital_write(pin=parsed_pin, value=value)
         elif type_ == WRITE_MODE.SERVO:
             self.__board.servo_write(pin_number=parsed_pin, angle=value)
         elif type_ == WRITE_MODE.STEPPER:
             if number_of_steps is None:
-                raise TypeError("number_of_steps is required to write to a stepper")
+                raise AlimataExpectedValue("number_of_steps is required to write to a stepper")
             else:
                 raise NotImplementedError("Stepper not implemented yet")
 
         # Tone Duration OUTPUT
         elif type_ == WRITE_MODE.TONE:
             if duration is None:
-                raise TypeError("duration (in ms) is required for tone")
+                raise AlimataExpectedValue("duration (in ms) is required for tone")
             self.__board.tone(pin_number=parsed_pin, frequency=value, duration=duration)
         elif type_ == WRITE_MODE.TONE_CONTINUOUS:
             self.__board.tone(pin_number=parsed_pin, frequency=value)
         elif type_ == WRITE_MODE.TONE_STOP:
             self.__board.no_tone(pin_number=parsed_pin)
         else:
-            raise TypeError("type must be one of the WRITE_MODE enum")
+            raise AlimataUnexpectedWriteMode("type must be one of the WRITE_MODE enum")
     
     def i2c_comunication(self, command: I2C_COMMAND, adress, i2c_port: int = 0, register = None, number_of_bytes = None, args: list = None, callback = None):
         if command == I2C_COMMAND.READ:
             if number_of_bytes is None or register is None:
-                raise TypeError("number_of_bytes and register are required to read from i2c")
+                raise AlimataExpectedValue("number_of_bytes and register are required to read from i2c")
             else:
                 self.__board.i2c_read(address=adress, register=register, number_of_bytes=number_of_bytes, callback=callback, i2c_port=i2c_port)
         elif command == I2C_COMMAND.WRITE:
             if args is None :
-                raise TypeError("args are required to write to i2c")
+                raise AlimataExpectedValue("args are required to write to i2c")
             else:
                 self.__board.i2c_write(address=adress, args=args, i2c_port=i2c_port)
         elif command == I2C_COMMAND.READ_RESTART_TRANSMISSION:
             if number_of_bytes is None or register is None:
-                raise TypeError("number_of_bytes and register are required to read from i2c")
+                raise AlimataExpectedValue("number_of_bytes and register are required to read from i2c")
             else:
                 self.__board.i2c_read_restart_transmission(address=adress, register=register, number_of_bytes=number_of_bytes, callback=callback, i2c_port=i2c_port)
         else:
-            raise TypeError("command must be one of the I2C_COMMAND enum")
+            raise AlimataUnexpectedI2cCommand("command must be one of the I2C_COMMAND enum")
     
     def spi_commuinication(self, command: SPI_COMMAND, cs_pin : Union[int,str], _bytes: list = None, register = None, number_of_bytes = None, callback = None):
         parsed_cs_pin = self.parse_pin_number(pin=cs_pin, type_=PIN_MODE.SPI)
@@ -220,13 +222,13 @@ class Board:
         
         if command == SPI_COMMAND.WRITE_BLOCKING:
             if _bytes is None:
-                raise TypeError("bytes are required to write to spi")
+                raise AlimataExpectedValue("bytes are required to write to spi")
             self.__board.spi_write_blocking(_bytes)
         elif command == SPI_COMMAND.READ_BLOCKING:
             if number_of_bytes is None:
-                raise TypeError("number_of_bytes is required to read from spi")
+                raise AlimataExpectedValue("number_of_bytes is required to read from spi")
             if register is None:
-                raise TypeError("register is required to read from spi")
+                raise AlimataExpectedValue("register is required to read from spi")
             self.__board.spi_read_blocking(register_selection=register, number_of_bytes=number_of_bytes, call_back=callback)
         elif command == SPI_COMMAND.SET_FORMAT:
             #TODO: Implement this
