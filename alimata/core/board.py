@@ -1,5 +1,5 @@
 from alimata.core.core import DHT_TYPE, PIN_MODE, WRITE_MODE, I2C_COMMAND, SPI_COMMAND, print_warning
-from alimata.core.error import AlimataUnexpectedPin, AlimataUnexpectedPinMode, AlimataUnexpectedWriteMode, AlimataUnexpectedValue, AlimataUnexpectedI2cCommand, AlimataExpectedValue
+from alimata.core.error import AlimataUnexpectedPin, AlimataUnexpectedPinMode, AlimataUnexpectedWriteMode, AlimataUnexpectedValue, AlimataUnexpectedI2cCommand, AlimataExpectedValue, AlimataCallbackNotDefined
 from firmetix import firmetix
 from typing import Optional, Union
 import sys, datetime
@@ -119,23 +119,32 @@ class Board:
         parsed_pin = self.parse_pin_number(pin=pin, type_=type_)
         
         if type_ == PIN_MODE.DIGITAL_INPUT:
+            if callback is None:
+                raise AlimataCallbackNotDefined("Callback must be defined for digital input")
             self.__board.set_pin_mode_digital_input(pin_number=parsed_pin, callback=callback)
         elif type_ == PIN_MODE.DIGITAL_OUTPUT:
             self.__board.set_pin_mode_digital_output(pin_number=parsed_pin)
         elif type_ == PIN_MODE.PULLUP:
+            if callback is None:
+                raise AlimataCallbackNotDefined("Callback must be defined for pullup input")
             self.__board.set_pin_mode_digital_input_pullup(pin_number=parsed_pin, callback=callback)
         elif type_ == PIN_MODE.ANALOG_INPUT:
-            self.__board.set_pin_mode_analog_input(pin_number=parsed_pin, differential=differential, callback=callback)
+            if callback is None:
+                raise AlimataCallbackNotDefined("Callback must be defined for analog input")
+            self.__board.set_pin_mode_analog_input(pin_number=parsed_pin, callback=callback, differential=differential)
         elif type_ == PIN_MODE.ANALOG_OUTPUT:
             self.__board.set_pin_mode_analog_output(pin_number=parsed_pin)
         elif type_ == PIN_MODE.SONAR:
             if type(parsed_pin) is not list:
                 raise AlimataUnexpectedPin("pin must be a list (trigger_pin, echo_pin)")
-            else:
-                self.__board.set_pin_mode_sonar(trigger_pin=parsed_pin[0], echo_pin=parsed_pin[1], callback=callback)
+            elif callback is None:
+                raise AlimataCallbackNotDefined("Callback must be defined for sonar")
+            self.__board.set_pin_mode_sonar(trigger_pin=parsed_pin[0], echo_pin=parsed_pin[1], callback=callback)
         elif type_ == PIN_MODE.DHT:
             if dht_type is None:
                 raise AlimataExpectedValue("dht_type is required to setup a dht")
+            elif callback is None:
+                raise AlimataCallbackNotDefined("Callback must be defined for dht")
             self.__board.set_pin_mode_dht(pin_number=parsed_pin, callback=callback, dht_type=dht_type)
         elif type_ == PIN_MODE.SERVO:
             self.__board.set_pin_mode_servo(pin_number=parsed_pin, min_pulse=min_pulse, max_pulse=max_pulse)
@@ -144,8 +153,7 @@ class Board:
                 raise AlimataUnexpectedPin("pin must be a list of 2 or 4 pins")
             elif steps_per_revolution is None:
                 raise AlimataExpectedValue("steps_per_revolution is required to setup a stepper")
-            else:
-                raise NotImplementedError("Stepper not implemented yet")
+            raise NotImplementedError("Stepper not implemented yet")
         elif type_ == PIN_MODE.TONE:
             self.__board.set_pin_mode_tone(pin_number=parsed_pin)
         elif type_ == PIN_MODE.I2C:
