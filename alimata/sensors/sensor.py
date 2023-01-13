@@ -2,7 +2,7 @@ from alimata.core.board import Board
 from alimata.core.core import DHT_TYPE
 from typing import Callable, Optional, Union
 
-from abc import ABC, abstractmethod, abstractproperty
+from abc import ABC, abstractmethod
 
 
 
@@ -31,7 +31,6 @@ class Sensor(ABC):
                 type_: str, 
                 dht_type: Optional[DHT_TYPE] = None, # Facultative
                 differential: Optional[int] = 1, # Facultative
-                timeout: Optional[int] = 80000, # Facultative
                 on_change: Optional[Callable[[list], None]] = None # Facultative
                 ):
 
@@ -43,7 +42,6 @@ class Sensor(ABC):
         self.__type = type_
         self.__dht_type = dht_type
         self.__differential = differential
-        self.__timeout = timeout
         self.__on_change: Optional[Callable[[list], None]] = on_change
 
         # Set the pin and callback of the sensor
@@ -52,8 +50,7 @@ class Sensor(ABC):
             type_=self.__type,
             dht_type=self.__dht_type,
             callback=self.__callback,
-            differential=self.__differential,
-            timeout=self.__timeout)
+            differential=self.__differential)
 
     
     def on_change(self, on_change: Callable[[list], None]):

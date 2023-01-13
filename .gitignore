@@ -131,3 +131,5 @@ dmypy.json
 
 .idea/
 .vscode/launch.json
+
+.DS_Store

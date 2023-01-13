@@ -74,6 +74,10 @@ class Lcd(Actuator):
     
     Methods
     -------
+    print(string: str, col: int = None, row: int = None)
+        Prints a string on the LCD at the current position (or at the specified position)
+    quick_print(ligne1: str, ligne2: str = "", ligne3: str = "", ligne4: str = "")
+        Quickly prints 1 to 4 lines on the LCD
     clear()
         Clears the lcd
     home()
@@ -110,8 +114,8 @@ class Lcd(Actuator):
 
     def __init__(self, board: Board, adress, cols: int, rows: int, dot_size: int = 0):
 
-        self.__read_delay = 0
-        super().__init__(board=board, pin=self.__read_delay, type_=PIN_MODE.I2C)
+        self.__i2c_port = 0
+        super().__init__(board=board, pin=self.__i2c_port, type_=PIN_MODE.I2C)
 
         self.__board = board
 
@@ -125,6 +129,7 @@ class Lcd(Actuator):
         self.__current_row = 0
         self.__current_col = 0
         self.__custom_chars = {0: None, 1: None, 2: None, 3: None, 4: None, 5: None, 6: None, 7: None}
+        self.__writing = False
 
         self.__backlight = Lcd_COMMAND.LCD_NOBACKLIGHT
         self.__display_function = Lcd_COMMAND.LCD_4BITMODE | Lcd_COMMAND.LCD_1LINE | Lcd_COMMAND.LCD_5x8DOTS
@@ -147,16 +152,16 @@ class Lcd(Actuator):
         sleep(1)
 
         # put the LCD into 4 bit mode
-        self.__write_4_bits(0b110000)
-        sleep(0.0045)
+        self.__send(0b110000, 0, True)
+        sleep(0.045)
 
-        self.__write_4_bits(0b110000)
-        sleep(0.0045)
+        self.__send(0b110000, 0, True)
+        sleep(0.15)
 
-        self.__write_4_bits(0b110000)
-        sleep(0.00015)
+        self.__send(0b110000, 0, True)
+        sleep(0.045)
 
-        self.__write_4_bits(0b100000)
+        self.__send(0b100000, 0, True)
 
         # set # lines, font size, etc.
 
@@ -173,6 +178,8 @@ class Lcd(Actuator):
         self.home()
 
         self.enable_backlight()
+
+        sleep(2) # wait for the lcd to be ready
 
         print("LCD started | adress : " + hex(self.__address))
     
@@ -222,19 +229,41 @@ class Lcd(Actuator):
         '''Returns the custom chars'''
         return self.__custom_chars
     
-    def print(self, string: str):
-        '''Prints a string on the LCD'''
+    def print(self, string: str, col: int = None, row: int = None):
+        '''Prints a string on the LCD at the current position (or at the specified position)'''
+        if col is not None and row is not None:
+            self.set_cursor(col, row)
+        if self.__writing:
+            self.__writing = False
+            print_warning("LCD print overwriten")
+            sleep(0.1)
+        self.__writing = True
         for character in string:
+            if not self.__writing:
+                break
             self.__send(ord(character), Lcd_COMMAND.RS)
             sleep(0.000002)
         else:
             sleep(0.00005)
         sleep(0.0001)
+        self.__writing = False
+    
+    def quick_print(self, ligne1: str, ligne2: str = "", ligne3: str = "", ligne4: str = ""):
+        '''Quickly prints 1 to 4 lines on the LCD'''
+        self.home()
+        self.print(ligne1)
+        self.set_cursor(0, 1)
+        self.print(ligne2)
+        self.set_cursor(0, 2)
+        self.print(ligne3)
+        self.set_cursor(0, 3)
+        self.print(ligne4)
 
     def clear(self):
         '''Clears the LCD'''
+        self.__writing = False
         self.__command(Lcd_COMMAND.LCD_CLEARDISPLAY)
-        sleep(0.002)
+        sleep(0.005)
 
     def home(self):
         '''Sets the cursor to the home position'''
@@ -354,29 +383,28 @@ class Lcd(Actuator):
         elif self.__custom_chars[id] is None:
             raise ValueError('Custom character with id {} does not exist, creat a new char with the creat_char() function'.format(id))
         else:
-            self.__write_4_bits(Lcd_COMMAND.RS | (id & 0xF0))
-            self.__write_4_bits(Lcd_COMMAND.RS | ((id << 4) & 0xF0))
+            self.__send(id, Lcd_COMMAND.RS)
 
     def __command(self, value):
         self.__send(value, 0)
-        sleep(0.00005)
-
-    def __send(self, value: int, mode: int):
-        high_bits: int = value & 0b11110000
-        low_bits: int = (value << 4) & 0b11110000
-        self.__write_4_bits(high_bits | mode)
-        self.__write_4_bits(low_bits | mode)
-
-    def __write_4_bits(self, value: int):
-        self.__i2c_write(value)
-        self.__pulse_enable(value)
-
-    def __pulse_enable(self, data: int):
-        self.__i2c_write(data | Lcd_COMMAND.EN)
         sleep(0.000001)
 
-        self.__i2c_write(data &~ Lcd_COMMAND.EN)
-        sleep(0.00005)
+    def __send(self, value: int, mode: int, init: bool = False):
+        '''Sends a value to the LCD mode (0, 1 = regerister select)'''
+        high_bits: int = value & 0b11110000
+        low_bits: int = (value << 4) & 0b11110000
+
+        self.__i2c_write(high_bits | mode | Lcd_COMMAND.EN)
+        sleep(0.000001)
+        self.__i2c_write(high_bits | mode)
+        sleep(0.00001)
+        if not init: # init only need half bits
+
+            sleep(0.00004)
+
+            self.__i2c_write(low_bits | mode | Lcd_COMMAND.EN)
+            sleep(0.000001)
+            self.__i2c_write(low_bits | mode)
 
     def __i2c_write(self, data: int):
         self.__board.i2c_comunication(I2C_COMMAND.WRITE, self.address, args=[data | self.__backlight])

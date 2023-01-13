@@ -1,1 +1,1 @@
-pymata4
+firmetix >= 6.0.1

@@ -37,6 +37,7 @@ class PIN_MODE(str, Enum):
     STEPPER = "STEPPER"
     TONE = "TONE"
     I2C = "I2C"
+    SPI = "SPI"
 
 class WRITE_MODE(str, Enum):
     ANALOG = "ANALOG"
@@ -47,17 +48,17 @@ class WRITE_MODE(str, Enum):
     TONE_CONTINUOUS = "TONE_CONTINUOUS"
     TONE_STOP = "TONE_STOP"
 
-class DHT_TYPE(str, Enum):
-    DHT11 = "DHT11"
-    DHT12 = "DHT12"
-    DHT21 = "DHT21"
-    DHT22 = "DHT22"
-    AM2301 = "AM2301"
+class DHT_TYPE(int, Enum):
+    DHT11 = 11
+    DHT22 = 22
 
 class I2C_COMMAND(str, Enum):
     READ = "READ"
     READ_CONTINUOUS = "READ_CONTINUOUS"
     READ_RESTART_TRANSMISSION = "READ_RESTART_TRANSMISSION"
-    READ_SAVED_DATA = "READ_SAVED_DATA"
     WRITE = "WRITE"
 
+class SPI_COMMAND(str, Enum):
+    READ_BLOCKING = "READ_BLOCKING"
+    WRITE_BLOCKING = "WRITE_BLOCKING"
+    SET_FORMAT = "SET_FORMAT"
