@@ -2,29 +2,29 @@
 
 ## What is it?
 
-Alimata is a python library used to simplify the implementation of [firmetix](https://nilon123456789.github.io/fimetix/) library
+Alimata is a python library used to simplify the implementation of [firmetix](https://github.com/Nilon123456789/firmetix) library
 
 ## Requirements
 
 - python 3.7 or higher
-- Fimetix
+- Firmetix
 - Fimetix4Arduino
 
 ## Installing
 
-### Fimetix
+### Firmetix
 
-To install Pymata4 on Linux (including Raspberry Pi) and macOS computers, open a terminal window and type: `sudo pip3 install pymata4`
+To install Fimetix on Linux (including Raspberry Pi) and macOS computers, open a terminal window and type: `sudo pip3 install firmetix`
 
-For Windows users type: `pip install fimetix`
+For Windows users type: `pip install firmetix`
 
-### Fimetix4Arduino
+### Firmetix4Arduino
 
 1. Open the Arduino IDE and select Tools/Manage Libraries
-2. Search for "fimetix4arduino"
+2. Search for "firmetix4arduino"
 3. Install
-4. Fimetix4Arduino also requires other library just install all of them.
-5. Open the Fimetix4Arduino example
+4. Firmetix4Arduino also requires other library just install all of them.
+5. Open the Firmetix4Arduino example
 6. If you plan to use multiple arduino use `#define ARDUINO_INSTANCE_ID 1`
 7. Flash it to the arduino
 
