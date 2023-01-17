@@ -1,4 +1,4 @@
-from alimata.core.core import DHT_TYPE, PIN_MODE, WRITE_MODE, I2C_COMMAND, SPI_COMMAND, print_warning
+from alimata.core.core import DHT_TYPE, PIN_MODE, WRITE_MODE, I2C_COMMAND, SPI_COMMAND, STEPPER_TYPE, print_warning
 from alimata.core.error import AlimataUnexpectedPin, AlimataUnexpectedPinMode, AlimataUnexpectedWriteMode, AlimataUnexpectedValue, AlimataUnexpectedI2cCommand, AlimataExpectedValue
 from firmetix import firmetix
 from typing import Optional, Union
@@ -115,7 +115,8 @@ class Board:
         return int(pin)
 
 
-    def set_pin_mode(self, pin: Union[str, int, list], type_: PIN_MODE, callback=None, dht_type: Optional[DHT_TYPE] = None, differential: int = 0, min_pulse: int = 544, max_pulse:int =2400, steps_per_revolution: Optional[int] = None):
+    def set_pin_mode(self, pin: Union[str, int, list], type_: PIN_MODE, callback=None, dht_type: Optional[DHT_TYPE] = None, differential: int = 0, min_pulse: int = 544, max_pulse:int =2400, stepper_type: Optional[STEPPER_TYPE] = None) -> Union[None, int]:
+        ''' Set the pin mode for the pins (return None execpt for stepper)'''
         parsed_pin = self.parse_pin_number(pin=pin, type_=type_)
         
         if type_ == PIN_MODE.DIGITAL_INPUT:
@@ -141,11 +142,11 @@ class Board:
             self.__board.set_pin_mode_servo(pin_number=parsed_pin, min_pulse=min_pulse, max_pulse=max_pulse)
         elif type_ == PIN_MODE.STEPPER:
             if type(parsed_pin) is not list:
-                raise AlimataUnexpectedPin("pin must be a list of 2 or 4 pins")
+                raise TypeError("pin must be a list of 2 or 4 pins")
             elif steps_per_revolution is None:
-                raise AlimataExpectedValue("steps_per_revolution is required to setup a stepper")
+                raise TypeError("steps_per_revolution is required to setup a stepper")
             else:
-                raise NotImplementedError("Stepper not implemented yet")
+                return self.__board.set_pin_mode_stepper(interface=stepper_type, pin1=parsed_pin[0], pin2=parsed_pin[1], pin3=parsed_pin[2], pin4=parsed_pin[3], enable=True)
         elif type_ == PIN_MODE.TONE:
             self.__board.set_pin_mode_tone(pin_number=parsed_pin)
         elif type_ == PIN_MODE.I2C:
@@ -157,7 +158,7 @@ class Board:
 
         
     # Use PWM for analog write
-    def write_to_pin(self, pin: Union[str, int], type_: WRITE_MODE, value: int, duration: Optional[int] = None, number_of_steps: Optional[int] = None):
+    def write_to_pin(self, pin: Union[str, int], type_: WRITE_MODE, value: int, duration: Optional[int] = None):
         parsed_pin = self.parse_pin_number(pin=pin, type_=type_)
 
         # Analog OUTPUT
@@ -181,7 +182,7 @@ class Board:
             self.__board.servo_write(pin_number=parsed_pin, angle=value)
         elif type_ == WRITE_MODE.STEPPER:
             if number_of_steps is None:
-                raise AlimataExpectedValue("number_of_steps is required to write to a stepper")
+                raise TypeError("number_of_steps is required to write to a stepper")
             else:
                 raise NotImplementedError("Stepper not implemented yet")
 

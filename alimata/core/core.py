@@ -43,7 +43,6 @@ class WRITE_MODE(str, Enum):
     ANALOG = "ANALOG"
     DIGITAL = "DIGITAL"
     SERVO = "SERVO"
-    STEPPER = "STEPPER"
     TONE = "TONE"
     TONE_CONTINUOUS = "TONE_CONTINUOUS"
     TONE_STOP = "TONE_STOP"
@@ -51,6 +50,14 @@ class WRITE_MODE(str, Enum):
 class DHT_TYPE(int, Enum):
     DHT11 = 11
     DHT22 = 22
+
+class STEPPER_TYPE(int, Enum):
+    STEPPER = 1
+    FULL2WIRE = 2
+    FULL3WIRE = 3
+    FULL4WIRE = 4
+    HALF3WIRE = 6
+    HALF4WIRE = 8
 
 class I2C_COMMAND(str, Enum):
     READ = "READ"
