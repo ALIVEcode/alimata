@@ -130,6 +130,7 @@ class Lcd(Actuator):
         self.__current_col = 0
         self.__custom_chars = {0: None, 1: None, 2: None, 3: None, 4: None, 5: None, 6: None, 7: None}
         self.__writing = False
+        self.__current_text = {"", "", "", ""}
 
         self.__backlight = Lcd_COMMAND.LCD_NOBACKLIGHT
         self.__display_function = Lcd_COMMAND.LCD_4BITMODE | Lcd_COMMAND.LCD_1LINE | Lcd_COMMAND.LCD_5x8DOTS
@@ -229,10 +230,18 @@ class Lcd(Actuator):
         '''Returns the custom chars'''
         return self.__custom_chars
     
+    @property
+    def get_current_text(self):
+        '''Returns the current text on the LCD (as a list)'''
+        return self.__current_text
+    
     def print(self, string: str, col: int = None, row: int = None):
         '''Prints a string on the LCD at the current position (or at the specified position)'''
         if col is not None and row is not None:
             self.set_cursor(col, row)
+        if self.__text_already_set(string, self.current_col, self.current_row):
+            print_warning("Text already set on the LCD | skipping ...")
+            return
         if self.__writing:
             self.__writing = False
             print_warning("LCD print overwriten")
@@ -276,6 +285,10 @@ class Lcd(Actuator):
 
     def set_cursor(self, column: int, row: int):
         '''Sets the cursor to a specific position (column, row)'''
+        if column == self.__current_col and row == self.__current_row:
+            print_warning("Cursor already set to this position | skipping ...")
+            return
+
         row_offsets = [0x00, 0x40, 0x14, 0x54]
         if row > self.__rows:
             row = self.__rows - 1
@@ -384,6 +397,17 @@ class Lcd(Actuator):
             raise ValueError('Custom character with id {} does not exist, creat a new char with the creat_char() function'.format(id))
         else:
             self.__send(id, Lcd_COMMAND.RS)
+        
+    def __text_already_set(self, text: str, col: int, row: int) -> bool:
+        '''Checks if the text is already on the display'''
+
+        current_text = self.__current_text[row]
+
+        if col != 0:
+            if col < len(current_text):
+                current_text = current_text[col:] # Remove the text before the col
+        
+        return current_text == text
 
     def __command(self, value):
         self.__send(value, 0)
