@@ -130,7 +130,7 @@ class Lcd(Actuator):
         self.__current_col = 0
         self.__custom_chars = {0: None, 1: None, 2: None, 3: None, 4: None, 5: None, 6: None, 7: None}
         self.__writing = False
-        self.__current_text = {"", "", "", ""}
+        self.__current_text = ["", "", "", ""]
 
         self.__backlight = Lcd_COMMAND.LCD_NOBACKLIGHT
         self.__display_function = Lcd_COMMAND.LCD_4BITMODE | Lcd_COMMAND.LCD_1LINE | Lcd_COMMAND.LCD_5x8DOTS
@@ -404,10 +404,16 @@ class Lcd(Actuator):
         current_text = self.__current_text[row]
 
         if col != 0:
-            if col < len(current_text):
+            if col < len(current_text) and self.__current_text:
                 current_text = current_text[col:] # Remove the text before the col
-        
-        return current_text == text
+        if col + len(text) < len(self.__current_text[row]):
+            current_text = current_text[:(col + len(text))] # Get only the text of the lengh
+
+        if text == current_text: 
+            return True # the text is already set
+
+        self.__current_text[row] = self.__current_text[row][:col] + text + self.__current_text[row][(col + len(text)):]
+        return False
 
     def __command(self, value):
         self.__send(value, 0)
