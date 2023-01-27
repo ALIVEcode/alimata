@@ -246,11 +246,21 @@ class Lcd(Actuator):
             self.__writing = False
             print_warning("LCD print overwriten")
             sleep(0.1)
+
         self.__writing = True
         for character in string:
             if not self.__writing:
                 break
             self.__send(ord(character), Lcd_COMMAND.RS)
+
+            # Increment the current column
+            self.__current_col += 1
+            if self.__current_col == self.__cols: # If the current column is out of range go to the next line
+                self.__current_col = 0
+                self.__current_row += 1 
+                if self.__current_row == self.__rows: # If the current row is out of range go to the first line
+                    self.__current_row = 0
+
             sleep(0.000002)
         else:
             sleep(0.00005)
@@ -260,13 +270,10 @@ class Lcd(Actuator):
     def quick_print(self, ligne1: str, ligne2: str = "", ligne3: str = "", ligne4: str = ""):
         '''Quickly prints 1 to 4 lines on the LCD'''
         self.home()
-        self.print(ligne1)
-        self.set_cursor(0, 1)
-        self.print(ligne2)
-        self.set_cursor(0, 2)
-        self.print(ligne3)
-        self.set_cursor(0, 3)
-        self.print(ligne4)
+        self.print(ligne1, 0, 0)
+        self.print(ligne2, 0, 1)
+        self.print(ligne3, 0, 2)
+        self.print(ligne4, 0, 3)
 
     def clear(self):
         '''Clears the LCD'''
