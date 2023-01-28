@@ -156,6 +156,17 @@ class Board:
                 raise AlimataExpectedValue("steps_per_revolution is required to setup a stepper")
             else:
                 raise NotImplementedError("Stepper not implemented yet")
+        elif type_ == PIN_MODE.LCD4BIT:
+            # TODO MAKE BETTER PIN CHECK
+            if type(parsed_pin) is not list or len(parsed_pin) != 6:
+                raise TypeError("pin must be a list of pins : [rs, en, d4, d5, d6, d7]")
+            self.__board.set_pin_mode_digital_output(pin_number=parsed_pin[0])
+            self.__board.set_pin_mode_digital_output(pin_number=parsed_pin[1])
+            self.__board.set_pin_mode_digital_output(pin_number=parsed_pin[2])
+            self.__board.set_pin_mode_digital_output(pin_number=parsed_pin[3])
+            self.__board.set_pin_mode_digital_output(pin_number=parsed_pin[4])
+            self.__board.set_pin_mode_digital_output(pin_number=parsed_pin[5])
+            
         elif type_ == PIN_MODE.TONE:
             self.__board.set_pin_mode_tone(pin_number=parsed_pin)
         elif type_ == PIN_MODE.I2C:

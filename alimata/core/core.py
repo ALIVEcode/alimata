@@ -38,6 +38,7 @@ class PIN_MODE(str, Enum):
     TONE = "TONE"
     I2C = "I2C"
     SPI = "SPI"
+    LCD4BIT = "LCD4BIT"
 
 class WRITE_MODE(str, Enum):
     ANALOG = "ANALOG"
