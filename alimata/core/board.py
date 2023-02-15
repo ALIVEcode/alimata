@@ -35,7 +35,7 @@ class Board:
     """
 
     def __init__(self, board_id: int = 1, COM_port=None):
-        self.__board = firmetix.Frimetix(arduino_instance_id=board_id, com_port=COM_port, arduino_wait=2)
+        self.__board = firmetix.Firmetix(arduino_instance_id=board_id, com_port=COM_port, arduino_wait=2)
         self.__board_id = board_id
         self.__is_started = False
 
