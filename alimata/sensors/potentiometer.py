@@ -20,7 +20,7 @@ class Potentiometer(Sensor):
 
     Properties
     ----------
-    data : bool
+    data : int
         the value of the Potentiometer (0 to 255)
     """
 
@@ -41,8 +41,8 @@ class Potentiometer(Sensor):
 
     # ABSTRACT FROM SENSOR
     @property
-    def data(self) -> bool:
-        """Return the current value of the Potentiometer (True or False)"""
+    def data(self) -> int:
+        """Return the current value of the Potentiometer (0 to 255)"""
         return self.__data
 
     # ABSTRACT FROM SENSOR
