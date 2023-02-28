@@ -3,8 +3,7 @@ from alimata.core.board import Board
 from alimata.core.core import DHT_TYPE
 from time import sleep
 
-
-#Creating a new board
+# Creating a new board
 board = Board()
 
 
@@ -18,8 +17,7 @@ dhtPin = 5
 dht = DHT(board, dhtPin, DHT_TYPE.DHT11)
 
 
-
-#Main function
+# Main function
 def setup():
     print("Starting main")
 
@@ -30,8 +28,7 @@ def loop():
         hum = dht.humidity
         print("Temp : " + str(temp) + " | Humidity : " + str(hum))
 
-
-
     sleep(1)
+
 
 board.start(setup, loop)

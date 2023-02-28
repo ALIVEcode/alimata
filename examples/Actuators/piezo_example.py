@@ -17,15 +17,13 @@ def setup():
     print("Starting main")
 
 
-
 def loop():
     sleep(1)
-    piezo.playTone(1000, 1000)
+    piezo.play_tone(1000, 1000)
     sleep(2)
-    piezo.playTone(5000)
+    piezo.play_tone(5000)
     sleep(0.5)
-    piezo.stopTone()
-
+    piezo.stop_tone()
 
 
 board.start(setup, loop)

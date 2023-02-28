@@ -1,4 +1,4 @@
-#Implementation based on the implementation in the example code of the pymata 4 library
+# Implementation based on the implementation in the example code of the pymata 4 library
 
 from typing import Union
 from alimata.core.board import Board
@@ -6,6 +6,7 @@ from alimata.core.core import PIN_MODE, print_warning, WRITE_MODE
 from alimata.actuators.actuator import Actuator
 from time import sleep
 from enum import Enum
+
 
 class Lcd_COMMAND(int, Enum):
     # commands
@@ -25,30 +26,31 @@ class Lcd_COMMAND(int, Enum):
     LCD_ENTRYSHIFTDECREMENT = 0
 
     # flags for display on/off control 1|D|C|B
-    LCD_DISPLAYON = 0b00000100 #D
-    LCD_DISPLAYOFF = 0 #D
-    LCD_CURSORON = 0b00000010 #C
-    LCD_CURSOROFF = 0 #C
-    LCD_BLINKON = 0b00000001 #B
-    LCD_BLINKOFF = 0 #B
+    LCD_DISPLAYON = 0b00000100  # D
+    LCD_DISPLAYOFF = 0  # D
+    LCD_CURSORON = 0b00000010  # C
+    LCD_CURSOROFF = 0  # C
+    LCD_BLINKON = 0b00000001  # B
+    LCD_BLINKOFF = 0  # B
 
     # flags for display/cursor shift 1|S/C|R/L|*
-    LCD_DISPLAYMOVE = 0b00001000 #S/C
-    LCD_CURSORMOVE = 0 #S/C
-    LCD_MOVERIGHT = 0b00000100 # R/L
-    LCD_MOVELEFT = 0 #R/L
+    LCD_DISPLAYMOVE = 0b00001000  # S/C
+    LCD_CURSORMOVE = 0  # S/C
+    LCD_MOVERIGHT = 0b00000100  # R/L
+    LCD_MOVELEFT = 0  # R/L
 
     # flags for function set 1|DL|N|F|*
-    LCD_8BITMODE = 0b00010000 #DL
-    LCD_4BITMODE = 0 #DL
-    LCD_2LINE = 0b00001000 #N
-    LCD_1LINE = 0 #N
-    LCD_5x10DOTS = 0b00000100 #F
-    LCD_5x8DOTS = 0 #F
+    LCD_8BITMODE = 0b00010000  # DL
+    LCD_4BITMODE = 0  # DL
+    LCD_2LINE = 0b00001000  # N
+    LCD_1LINE = 0  # N
+    LCD_5x10DOTS = 0b00000100  # F
+    LCD_5x8DOTS = 0  # F
 
     # flags for backlight control
     LCD_BACKLIGHT = 0b00001000
     LCD_NOBACKLIGHT = 0
+
 
 class Lcd4Bit(Actuator):
     """
@@ -107,14 +109,14 @@ class Lcd4Bit(Actuator):
         Sets the text to right to left
     
     """
-    
 
-    def __init__(self, board: Board, pin_rs: Union[str, int], pin_en: Union[str, int], pin_4: Union[str, int], pin_5: Union[str, int], pin_6: Union[str, int], pin_7: Union[str, int], cols: int, rows: int, dot_size: int = 0):
+    def __init__(self, board: Board, pin_rs: Union[str, int], pin_en: Union[str, int], pin_4: Union[str, int],
+                 pin_5: Union[str, int], pin_6: Union[str, int], pin_7: Union[str, int], cols: int, rows: int,
+                 dot_size: int = 0):
 
         # self.__i2c_port = 0
         self.__pins = [pin_rs, pin_en, pin_4, pin_5, pin_6, pin_7]
         super().__init__(board=board, pin=self.__pins, type_=PIN_MODE.LCD4BIT)
-
 
         # Constant values
         # self.__address = adress
@@ -178,35 +180,30 @@ class Lcd4Bit(Actuator):
 
         self.enable_backlight()
 
-        sleep(2) # wait for the lcd to be ready
+        sleep(2)  # wait for the lcd to be ready
 
         print("LCD 4 bit started")
-    
+
     @property
     def rows_number(self):
         '''Returns the number of rows'''
         return self.__rows
-    
+
     @property
     def cols_number(self):
         '''Returns the number of columns of the LCD'''
         return self.__cols
-    
-    @property 
+
+    @property
     def current_row(self):
         '''Returns the current row'''
         return self.__current_row
-    
+
     @property
     def current_col(self):
         '''Returns the current column'''
         return self.__current_col
 
-    @property
-    def address(self):
-        '''Returns the address of the LCD'''
-        return self.__address
-    
     @property
     def backlight(self):
         '''Get or set the backlight state'''
@@ -214,25 +211,24 @@ class Lcd4Bit(Actuator):
             return True
         else:
             return False
-    
-    @property
+
     @backlight.setter
     def backlight(self, value: bool):
         if value:
             self.enable_backlight()
         else:
             self.disable_backlight()
-    
+
     @property
     def get_chars(self):
         '''Returns the custom chars'''
         return self.__custom_chars
-    
+
     @property
     def get_current_text(self):
         '''Returns the current text on the LCD (as a list)'''
         return self.__current_text
-    
+
     def print(self, string: str, col: int = None, row: int = None):
         '''Prints a string on the LCD at the current position (or at the specified position)'''
         if col is not None and row is not None:
@@ -253,10 +249,10 @@ class Lcd4Bit(Actuator):
 
             # Increment the current column
             self.__current_col += 1
-            if self.__current_col == self.__cols: # If the current column is out of range go to the next line
+            if self.__current_col == self.__cols:  # If the current column is out of range go to the next line
                 self.__current_col = 0
-                self.__current_row += 1 
-                if self.__current_row == self.__rows: # If the current row is out of range go to the first line
+                self.__current_row += 1
+                if self.__current_row == self.__rows:  # If the current row is out of range go to the first line
                     self.__current_row = 0
 
             sleep(0.000002)
@@ -264,7 +260,7 @@ class Lcd4Bit(Actuator):
             sleep(0.00005)
         sleep(0.0001)
         self.__writing = False
-    
+
     def quick_print(self, ligne1: str, ligne2: str = "", ligne3: str = "", ligne4: str = ""):
         '''Quickly prints 1 to 4 lines on the LCD'''
         self.home()
@@ -285,7 +281,7 @@ class Lcd4Bit(Actuator):
 
         self.__current_col = 0
         self.__current_row = 0
-        
+
         sleep(0.002)
 
     def set_cursor(self, column: int, row: int):
@@ -304,7 +300,7 @@ class Lcd4Bit(Actuator):
 
     def disable_display(self):
         '''Disables the display'''
-        self.__display_control = self.__display_control &~ Lcd_COMMAND.LCD_DISPLAYON
+        self.__display_control = self.__display_control & ~ Lcd_COMMAND.LCD_DISPLAYON
         self.__command(Lcd_COMMAND.LCD_DISPLAYON | self.__display_control)
 
     def enable_display(self):
@@ -314,7 +310,7 @@ class Lcd4Bit(Actuator):
 
     def disable_cursor(self):
         '''Disables the cursor'''
-        self.__display_control = self.__display_control &~ Lcd_COMMAND.LCD_CURSORON
+        self.__display_control = self.__display_control & ~ Lcd_COMMAND.LCD_CURSORON
         self.__command(Lcd_COMMAND.LCD_DISPLAYCONTROL | self.__display_control)
 
     def enable_cursor(self):
@@ -324,7 +320,7 @@ class Lcd4Bit(Actuator):
 
     def disable_blink(self):
         '''Disables the blinking cursor'''
-        self.__display_control = self.__display_control &~ Lcd_COMMAND.LCD_BLINKON
+        self.__display_control = self.__display_control & ~ Lcd_COMMAND.LCD_BLINKON
         self.__command(Lcd_COMMAND.LCD_DISPLAYCONTROL | self.__display_control)
 
     def enable_blink(self):
@@ -347,7 +343,7 @@ class Lcd4Bit(Actuator):
 
     def right_to_left(self):
         '''Sets the text direction to right to left'''
-        self.__display_mode = self.__display_mode &~ Lcd_COMMAND.LCD_ENTRYLEFT
+        self.__display_mode = self.__display_mode & ~ Lcd_COMMAND.LCD_ENTRYLEFT
         self.__command(Lcd_COMMAND.LCD_ENTRYMODESET | Lcd_COMMAND.__display_mode)
 
     def enable_auto_scroll(self):
@@ -357,7 +353,7 @@ class Lcd4Bit(Actuator):
 
     def disable_auto_scroll(self):
         '''Disables automatic scrolling'''
-        self.__display_mode = self.__display_mode &~ Lcd_COMMAND.LCD_ENTRYSHIFTINCREMENT
+        self.__display_mode = self.__display_mode & ~ Lcd_COMMAND.LCD_ENTRYSHIFTINCREMENT
         self.__command(Lcd_COMMAND.LCD_ENTRYMODESET | self.__display_mode)
 
     def disable_backlight(self):
@@ -371,14 +367,14 @@ class Lcd4Bit(Actuator):
         self.__backlight = Lcd_COMMAND.LCD_BACKLIGHT
         # TODO IMPLEMENT THIS
         # self.__i2c_write(0)
-    
+
     def creat_char(self, id: int, charmap: list):
         '''Creates a custom character (id 0-7, charmap 8 bytes)'''
         if id < 0 or id > 7:
             raise ValueError('id must be between 0 and 7')
         elif self.__custom_chars[id] is not None:
             print_warning('Overwriting custom character with id {}'.format(id))
-        
+
         self.__custom_chars[id] = charmap
 
         id %= 8
@@ -389,22 +385,24 @@ class Lcd4Bit(Actuator):
 
         for i in charmap:
             self.__send(i, 1)
-        
-        self.set_cursor(0, 0) # Set cursor to home position
+
+        self.set_cursor(0, 0)  # Set cursor to home position
 
         sleep(0.00005)
 
-        self.set_cursor(self.__current_col, self.__current_row) # Set cursor to previous position
-    
+        self.set_cursor(self.__current_col, self.__current_row)  # Set cursor to previous position
+
     def print_char(self, id: int):
         '''Prints a custom character (id 0-7)'''
         if id > 7 or id < 0:
             raise ValueError('id must be between 0 and 7')
         elif self.__custom_chars[id] is None:
-            raise ValueError('Custom character with id {} does not exist, creat a new char with the creat_char() function'.format(id))
+            raise ValueError(
+                'Custom character with id {} does not exist, creat a new char with the creat_char() function'.format(
+                    id))
         else:
             self.__send(id, 1)
-        
+
     def __text_already_set(self, text: str, col: int, row: int) -> bool:
         '''Checks if the text is already on the display'''
 
@@ -412,12 +410,12 @@ class Lcd4Bit(Actuator):
 
         if col != 0:
             if col < len(current_text) and self.__current_text:
-                current_text = current_text[col:] # Remove the text before the col
+                current_text = current_text[col:]  # Remove the text before the col
         if col + len(text) < len(self.__current_text[row]):
-            current_text = current_text[:(col + len(text))] # Get only the text of the lengh
+            current_text = current_text[:(col + len(text))]  # Get only the text of the lengh
 
-        if text == current_text: 
-            return True # the text is already set
+        if text == current_text:
+            return True  # the text is already set
 
         self.__current_text[row] = self.__current_text[row][:col] + text + self.__current_text[row][(col + len(text)):]
         return False
@@ -439,30 +437,24 @@ class Lcd4Bit(Actuator):
         low_pin5 = (value & 0b00000010) >> 1
         low_pin4 = (value & 0b00000001)
 
-        
-        self.__writeAllPins(high_pin4, high_pin5, high_pin6, high_pin7)
+        self.__write_all_pins(high_pin4, high_pin5, high_pin6, high_pin7)
         self.board.write_to_pin(self.__pins[0], WRITE_MODE.DIGITAL, mode)
         self.board.write_to_pin(self.__pins[1], WRITE_MODE.DIGITAL, 1)
 
-        
         sleep(0.000001)
         self.board.write_to_pin(self.__pins[1], WRITE_MODE.DIGITAL, 0)
 
-
-
         sleep(0.00001)
-        if not init: # init only need half bits
+        if not init:  # init only need half bits
 
             sleep(0.00004)
 
-            
-            self.__writeAllPins(low_pin4, low_pin5, low_pin6, low_pin7)
+            self.__write_all_pins(low_pin4, low_pin5, low_pin6, low_pin7)
             self.board.write_to_pin(self.__pins[1], WRITE_MODE.DIGITAL, 1)
             sleep(0.000001)
             self.board.write_to_pin(self.__pins[1], WRITE_MODE.DIGITAL, 0)
 
-
-    def __writeAllPins(self, p4: int, p5:int, p6:int, p7:int):  
+    def __write_all_pins(self, p4: int, p5: int, p6: int, p7: int):
         self.board.write_to_pin(self.__pins[2], WRITE_MODE.DIGITAL, p4)
         self.board.write_to_pin(self.__pins[3], WRITE_MODE.DIGITAL, p5)
         self.board.write_to_pin(self.__pins[4], WRITE_MODE.DIGITAL, p6)

@@ -12,24 +12,24 @@ bluePin = 11
 board = Board()
 
 # Creating a new led object
-rgbled = LedRGB(board, redPin, greenPin, bluePin)
+rgb_led = LedRGB(board, redPin, greenPin, bluePin)
 
 
 # Main function
 def setup():
     print("Starting main")
-    rgbled.rgb = (255, 255, 255)
-    rgbled.on()
+    rgb_led.rgb = (255, 255, 255)
+    rgb_led.on()
 
 
 def loop():
     
     # get random rgb values
-    rgbled.rgb = (50, 0, 0)
+    rgb_led.rgb = (50, 0, 0)
     sleep(0.1)
-    rgbled.rgb = (0, 50, 0)
+    rgb_led.rgb = (0, 50, 0)
     sleep(0.1)
-    rgbled.rgb = (0, 0, 50)
+    rgb_led.rgb = (0, 0, 50)
     sleep(0.1)
     
 

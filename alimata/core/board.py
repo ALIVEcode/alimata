@@ -1,5 +1,6 @@
 from alimata.core.core import DHT_TYPE, PIN_MODE, WRITE_MODE, I2C_COMMAND, SPI_COMMAND, STEPPER_TYPE, print_warning
-from alimata.core.error import AlimataUnexpectedPin, AlimataUnexpectedPinMode, AlimataUnexpectedWriteMode, AlimataUnexpectedValue, AlimataUnexpectedI2cCommand, AlimataExpectedValue, AlimataCallbackNotDefined
+from alimata.core.error import AlimataUnexpectedPin, AlimataUnexpectedPinMode, AlimataUnexpectedWriteMode, \
+    AlimataUnexpectedValue, AlimataUnexpectedI2cCommand, AlimataExpectedValue, AlimataCallbackNotDefined
 from firmetix import firmetix
 from typing import Optional, Union
 import sys, datetime
@@ -42,7 +43,6 @@ class Board:
         self.__setup_func = None
         self.__loop_func = None
 
-    
     def __main(self):
         # start the setup function
         self.__setup_func()
@@ -51,22 +51,21 @@ class Board:
         while self.__is_started:
             self.__loop_func()
 
-    def start(self, setup_func = None, loop_func = None):
-        if self.__is_started == True:
+    def start(self, setup_func=None, loop_func=None):
+        if self.__is_started:
             print_warning("Board is already started, not starting again")
             return
         elif setup_func is not None and loop_func is not None:
-            
+
             # saving the functions
             self.__setup_func = setup_func
             self.__loop_func = loop_func
 
-
             try:
-                    
+
                 self.__is_started = True
                 print("Board started")
-                
+
                 # start the main function
                 self.__main()
 
@@ -81,7 +80,7 @@ class Board:
 
     def is_started(self):
         return self.__is_started
-    
+
     @property
     def board_id(self):
         return self.__board_id
@@ -89,36 +88,39 @@ class Board:
     def shutdown(self):
         self.__is_started = False
 
-        print("\nSHUTING DOWN BOARD ! | ID : " + str(self.__board_id) + " | TIME : " + str(datetime.datetime.now().strftime("%H:%M:%S")))
+        print("\nSHUTING DOWN BOARD ! | ID : " + str(self.__board_id) + " | TIME : " + str(
+            datetime.datetime.now().strftime("%H:%M:%S")))
         self.__board.shutdown()
 
-    
     # Converting the analog pin value to the correct one depending on the board and function used
-    def parse_pin_number(self, pin: Union[str, int, list], type_) -> int:
+    def parse_pin_number(self, pin: Union[str, int, list], type_) -> Union[int, list]:
         if type(pin) == str:
-            if pin.startswith("A"): #Check if it's an analog pin
-                pin = int(pin[1:]) #Strip the A from the pin name
+            if pin.startswith("A"):  # Check if it's an analog pin
+                pin = int(pin[1:])  # Strip the A from the pin name
                 if type_ != PIN_MODE.ANALOG_INPUT:
-                    pin = pin + self.firmetix_board.first_analog_pin # If it's not an analog input, convert the pin to a digital pin
+                    # If it's not an analog input, convert the pin to a digital pin
+                    pin = pin + self.firmetix_board.first_analog_pin
             elif pin.isdigit():
                 pin = int(pin)
             else:
-                raise AlimataUnexpectedPin("The pin must either be in an int (1, 2, 3 ...) or a string (A1, A2, A3 ...)")   
+                raise AlimataUnexpectedPin(
+                    "The pin must either be in an int (1, 2, 3 ...) or a string (A1, A2, A3 ...)")
         elif type(pin) == list:
             mapped_pin = pin.copy()
             for i in range(len(pin)):
                 mapped_pin[i] = self.parse_pin_number(pin[i], type_)
             return mapped_pin
-        
+
         if type(pin) is not int:
             raise AlimataUnexpectedPin("The pin must either be in an int (1, 2, 3 ...) or a string (A1, A2, A3 ...)")
         return int(pin)
 
-
-    def set_pin_mode(self, pin: Union[str, int, list], type_: PIN_MODE, callback=None, dht_type: Optional[DHT_TYPE] = None, differential: int = 0, min_pulse: int = 544, max_pulse:int =2400, stepper_type: Optional[STEPPER_TYPE] = None) -> Union[None, int]:
+    def set_pin_mode(self, pin: Union[str, int, list], type_: PIN_MODE, callback=None,
+                     dht_type: Optional[DHT_TYPE] = None, differential: int = 0, min_pulse: int = 544,
+                     max_pulse: int = 2400, stepper_type: Optional[STEPPER_TYPE] = None) -> Union[None, int]:
         ''' Set the pin mode for the pins (return None execpt for stepper)'''
         parsed_pin = self.parse_pin_number(pin=pin, type_=type_)
-        
+
         if type_ == PIN_MODE.DIGITAL_INPUT:
             if callback is None:
                 raise AlimataCallbackNotDefined("Callback must be defined for digital input")
@@ -166,17 +168,18 @@ class Board:
             self.__board.set_pin_mode_digital_output(pin_number=parsed_pin[3])
             self.__board.set_pin_mode_digital_output(pin_number=parsed_pin[4])
             self.__board.set_pin_mode_digital_output(pin_number=parsed_pin[5])
-            
+
         elif type_ == PIN_MODE.TONE:
             self.__board.set_pin_mode_tone(pin_number=parsed_pin)
         elif type_ == PIN_MODE.I2C:
-            self.__board.set_pin_mode_i2c(i2c_port=parsed_pin) #I2C doesn't need a pin number so we use the pin parameter as the i2c port so 0 or 1
+            self.__board.set_pin_mode_i2c(
+                # I2C doesn't need a pin number so we use the pin parameter as the i2c port so 0 or 1
+                i2c_port=parsed_pin)
         elif type_ == PIN_MODE.SPI:
             self.__board.set_pin_mode_spi(chip_select_list=parsed_pin)
         else:
             raise AlimataUnexpectedPinMode("pin mode must be from the PIN_MODE enum")
 
-        
     # Use PWM for analog write
     def write_to_pin(self, pin: Union[str, int], type_: WRITE_MODE, value: int, duration: Optional[int] = None):
         parsed_pin = self.parse_pin_number(pin=pin, type_=type_)
@@ -217,15 +220,17 @@ class Board:
             self.__board.no_tone(pin_number=parsed_pin)
         else:
             raise AlimataUnexpectedWriteMode("type must be one of the WRITE_MODE enum")
-    
-    def i2c_comunication(self, command: I2C_COMMAND, adress, i2c_port: int = 0, register = None, number_of_bytes = None, args: list = None, callback = None):
+
+    def i2c_communication(self, command: I2C_COMMAND, adress, i2c_port: int = 0, register=None, number_of_bytes=None,
+                          args: list = None, callback=None):
         if command == I2C_COMMAND.READ:
             if number_of_bytes is None or register is None:
                 raise AlimataExpectedValue("number_of_bytes and register are required to read from i2c")
             else:
-                self.__board.i2c_read(address=adress, register=register, number_of_bytes=number_of_bytes, callback=callback, i2c_port=i2c_port)
+                self.__board.i2c_read(address=adress, register=register, number_of_bytes=number_of_bytes,
+                                      callback=callback, i2c_port=i2c_port)
         elif command == I2C_COMMAND.WRITE:
-            if args is None :
+            if args is None:
                 raise AlimataExpectedValue("args are required to write to i2c")
             else:
                 self.__board.i2c_write(address=adress, args=args, i2c_port=i2c_port)
@@ -233,14 +238,17 @@ class Board:
             if number_of_bytes is None or register is None:
                 raise AlimataExpectedValue("number_of_bytes and register are required to read from i2c")
             else:
-                self.__board.i2c_read_restart_transmission(address=adress, register=register, number_of_bytes=number_of_bytes, callback=callback, i2c_port=i2c_port)
+                self.__board.i2c_read_restart_transmission(address=adress, register=register,
+                                                           number_of_bytes=number_of_bytes, callback=callback,
+                                                           i2c_port=i2c_port)
         else:
             raise AlimataUnexpectedI2cCommand("command must be one of the I2C_COMMAND enum")
-    
-    def spi_commuinication(self, command: SPI_COMMAND, cs_pin : Union[int,str], _bytes: list = None, register = None, number_of_bytes = None, callback = None):
+
+    def spi_communication(self, command: SPI_COMMAND, cs_pin: Union[int, str], _bytes: list = None, register=None,
+                          number_of_bytes=None, callback=None):
         parsed_cs_pin = self.parse_pin_number(pin=cs_pin, type_=PIN_MODE.SPI)
-        self.__board.spi_cs_control(chip_select_pin=parsed_cs_pin, select=0) #Select the device
-        
+        self.__board.spi_cs_control(chip_select_pin=parsed_cs_pin, select=0)  # Select the device
+
         if command == SPI_COMMAND.WRITE_BLOCKING:
             if _bytes is None:
                 raise AlimataExpectedValue("bytes are required to write to spi")
@@ -250,13 +258,14 @@ class Board:
                 raise AlimataExpectedValue("number_of_bytes is required to read from spi")
             if register is None:
                 raise AlimataExpectedValue("register is required to read from spi")
-            self.__board.spi_read_blocking(register_selection=register, number_of_bytes=number_of_bytes, call_back=callback)
+            self.__board.spi_read_blocking(register_selection=register, number_of_bytes_to_read=number_of_bytes,
+                                           call_back=callback)
         elif command == SPI_COMMAND.SET_FORMAT:
-            #TODO: Implement this
+            # TODO: Implement this
             raise NotImplementedError("SPI set format not implemented yet")
 
-        self.__board.spi_cs_control(chip_select_pin=parsed_cs_pin, select=1) #Deselect the device
-    
+        self.__board.spi_cs_control(chip_select_pin=parsed_cs_pin, select=1)  # Deselect the device
+
     @property
     def firmetix_board(self):
         return self.__board

@@ -1,4 +1,4 @@
-from alimata.core.core import PIN_MODE, maprange
+from alimata.core.core import PIN_MODE, map_range
 from alimata.sensors.sensor import Sensor
 from alimata.core.board import Board
 from typing import Callable, Union, List
@@ -24,20 +24,17 @@ class Potentiometer(Sensor):
         the value of the Potentiometer (0 to 255)
     """
 
-
-
-    def __init__(self, board: Board, pin: str, differential: int = 1, on_change: Union[Callable[[List[Union[float, int]]], None], None ]= None):
-        
-
+    def __init__(self, board: Board, pin: str, differential: int = 1,
+                 on_change: Union[Callable[[List[Union[float, int]]], None], None] = None):
         # Initialises the Potentiometer as 0
-        self.__data = 0 # PRIVATE
+        self.__data = 0  # PRIVATE
 
-        super().__init__(board=board, pin=pin, type_=PIN_MODE.ANALOG_INPUT, differential=differential, on_change=on_change)
-
+        super().__init__(board=board, pin=pin, type_=PIN_MODE.ANALOG_INPUT, differential=differential,
+                         on_change=on_change)
 
     def mapped_data(self, min: int, max: int) -> int:
         """Return the current value of the Potentiometer mapped to the given range (min to max)"""
-        return maprange(self.__data, 0, 255, min, max)
+        return map_range(self.__data, 0, 255, min, max)
 
     # ABSTRACT FROM SENSOR
     @property
