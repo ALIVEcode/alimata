@@ -35,8 +35,6 @@ class Piezo(Actuator):
 
         if duration != 0:
             self.board.write_to_pin(pin=self.pin, type_=WRITE_MODE.TONE, value=frequency, duration=duration)
-
-
         else:
             self.board.write_to_pin(pin=self.pin, type_=WRITE_MODE.TONE_CONTINUOUS, value=frequency)
 
@@ -45,4 +43,4 @@ class Piezo(Actuator):
         Turn the led off \n
         """
         # self.__data = False # Set the status of the led to off
-        self.board.write_to_pin(pin=self.pin, type_=WRITE_MODE.TONE_STOP, value=None)
+        self.board.write_to_pin(pin=self.pin, type_=WRITE_MODE.TONE_STOP, value=0)

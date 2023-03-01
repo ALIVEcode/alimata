@@ -10,9 +10,9 @@ class Stepper(Actuator):
                  pin3: Optional[Union[str, int]] = None, pin4: Optional[Union[str, int]] = None, max_speed: int = 1000):
 
         if pin3 is None and pin4 is None:
-            pin_ = [pin1, pin2]
+            pin_ = [pin1, pin2, None, None]
         elif pin3 is not None and pin4 is None:
-            pin_ = [pin1, pin2, pin3]
+            pin_ = [pin1, pin2, pin3 , None]
         elif pin3 is not None and pin4 is not None:
             pin_ = [pin1, pin2, pin3, pin4]
         else:
@@ -138,7 +138,8 @@ class Stepper(Actuator):
             return False
         self.board.firmetix_board.stepper_move(self.motor_id, relative_position)
         self.board.firmetix_board.stepper_run_speed_to_position(self.motor_id,
-                                                                lambda data: self.__callback(data, user_callback=callback))
+                                                                lambda data: self.__callback(data,
+                                                                                             user_callback=callback))
         if wait:
             return self.__wait_for_callback(19)
         return True
@@ -150,7 +151,8 @@ class Stepper(Actuator):
             return False
         self.board.firmetix_board.stepper_move_to(self.motor_id, absolute_position)
         self.board.firmetix_board.stepper_run_speed_to_position(self.motor_id,
-                                                                lambda data: self.__callback(data, user_callback=callback))
+                                                                lambda data: self.__callback(data,
+                                                                                             user_callback=callback))
         if wait:
             return self.__wait_for_callback(19)
         return True
@@ -178,17 +180,18 @@ class Stepper(Actuator):
             user_callback(data)
         self.__callback_value = data
 
-    def __wait_for_callback(self, report_id: int) -> list:
+    def __wait_for_callback(self, report_id: int) -> Union[list, bool]:
         '''
             Waits for the callback to be called and returns the value if the report id is the same \n 
             15 = distance_to_go, \n
             16 = target_position, \n
             17 = current_position, \n
             18 = stepper_is_running \n
-            19 = stepper_run \n
+            19 = stepper_run (return a bool) \n
         '''
         # list [report_id, motor_id, value, time_stamp]
         while self.__callback_value[0] != report_id:
+            # TODO: possibly add a timeout
             pass
 
         if self.__callback_value[0] == 19:

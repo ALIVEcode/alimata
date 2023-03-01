@@ -56,7 +56,7 @@ class LedRGB(Actuator):
         """
         Turn the ledrgb on \n
         """
-        self._data = True  # Set the status of the ledrgb to on
+        self.__data = True  # Set the status of the ledrgb to on
         self.__red_led.on()  # Turn on the Red LED
         self.__green_led.on()  # Turn on the Green LED
         self.__blue_led.on()  # Turn on the Blue LED

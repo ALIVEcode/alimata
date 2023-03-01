@@ -129,7 +129,7 @@ class Lcd(Actuator):
         # Variables
         self.__current_row = 0
         self.__current_col = 0
-        self.__custom_chars = {0: None, 1: None, 2: None, 3: None, 4: None, 5: None, 6: None, 7: None}
+        self.__custom_chars = {0: [0], 1: [0], 2: [0], 3: [0], 4: [0], 5: [0], 6: [0], 7: [0]}
         self.__writing = False
         self.__current_text = ["", "", "", ""]
 
@@ -400,7 +400,7 @@ class Lcd(Actuator):
         '''Prints a custom character (id 0-7)'''
         if id > 7 or id < 0:
             raise ValueError('id must be between 0 and 7')
-        elif self.__custom_chars[id] is None:
+        elif self.__custom_chars[id] == [0]:
             raise ValueError(
                 'Custom character with id {} does not exist, creat a new char with the creat_char() function'.format(
                     id))

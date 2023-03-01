@@ -33,9 +33,9 @@ class Moisture(Sensor):
 
         self.__data = None
 
-    def mapped_data(self, min: int, max: int) -> int:
+    def mapped_data(self, min_val: int, max_val: int) -> int:
         """Return the current value of moisture mapped to the given range (min to max)"""
-        return map_range(self.__data, 0, 255, min, max)
+        return map_range(self.__data, 0, 255, min_val, max_val)
 
     def level(self) -> float:
         """Return the current level of moisture (0 to 100)"""

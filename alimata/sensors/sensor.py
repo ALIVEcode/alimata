@@ -1,6 +1,6 @@
 from alimata.core.board import Board
 from alimata.core.core import DHT_TYPE, PIN_MODE
-from typing import Callable, Optional, Union
+from typing import Callable, Optional, Union, List
 
 from abc import ABC, abstractmethod
 
@@ -25,7 +25,7 @@ class Sensor(ABC):
 
     # Constructor of the class Sensor
     def __init__(self,
-                 pin: Union[str, int, tuple],
+                 pin: Union[str, int, tuple, List[Union[str, int]]],
                  board: Board,
                  type_: PIN_MODE,
                  dht_type: Optional[DHT_TYPE] = None,  # Facultative

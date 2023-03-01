@@ -20,7 +20,7 @@ def callback_function(btn):
 
 def callback2(btn):
     print("Function 2 | PIN : " + str(btn.pin) + " | Value : " + str(btn.data))
-    if (btn.data):
+    if btn.data:
         led.intensity = 100
         led.on()
     else:

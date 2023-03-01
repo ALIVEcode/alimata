@@ -1,9 +1,12 @@
+import datetime
+import sys
+from typing import Optional, Union
+
+from firmetix import firmetix
+
 from alimata.core.core import DHT_TYPE, PIN_MODE, WRITE_MODE, I2C_COMMAND, SPI_COMMAND, STEPPER_TYPE, print_warning
 from alimata.core.error import AlimataUnexpectedPin, AlimataUnexpectedPinMode, AlimataUnexpectedWriteMode, \
     AlimataUnexpectedValue, AlimataUnexpectedI2cCommand, AlimataExpectedValue, AlimataCallbackNotDefined
-from firmetix import firmetix
-from typing import Optional, Union
-import sys, datetime
 
 
 class Board:
@@ -13,7 +16,7 @@ class Board:
     Attributes
     ----------
     board_id : int
-        The id of the board same as in telemetrix4arduino (read only)
+        The id of the board same as in firmetix4arduino (read only)
 
     
     Methods
@@ -69,7 +72,7 @@ class Board:
                 # start the main function
                 self.__main()
 
-            except (KeyboardInterrupt, RuntimeError) as e:
+            except (KeyboardInterrupt, RuntimeError):
                 self.shutdown()
                 sys.exit(0)
         elif setup_func is None or loop_func is None:
@@ -117,7 +120,7 @@ class Board:
 
     def set_pin_mode(self, pin: Union[str, int, list], type_: PIN_MODE, callback=None,
                      dht_type: Optional[DHT_TYPE] = None, differential: int = 0, min_pulse: int = 544,
-                     max_pulse: int = 2400, stepper_type: Optional[STEPPER_TYPE] = None) -> Union[None, int]:
+                     max_pulse: int = 2400, stepper_type: Optional[STEPPER_TYPE] = None):
         ''' Set the pin mode for the pins (return None execpt for stepper)'''
         parsed_pin = self.parse_pin_number(pin=pin, type_=type_)
 
@@ -154,10 +157,9 @@ class Board:
         elif type_ == PIN_MODE.STEPPER:
             if type(parsed_pin) is not list:
                 raise TypeError("pin must be a list of 2 or 4 pins")
-            elif steps_per_revolution is None:
-                raise AlimataExpectedValue("steps_per_revolution is required to setup a stepper")
             else:
-                raise NotImplementedError("Stepper not implemented yet")
+                self.__board.set_pin_mode_stepper(interface=stepper_type, pin1=parsed_pin[0], pin2=parsed_pin[1],
+                                                  pin3=parsed_pin[2], pin4=parsed_pin[3], enable=True)
         elif type_ == PIN_MODE.LCD4BIT:
             # TODO MAKE BETTER PIN CHECK
             if type(parsed_pin) is not list or len(parsed_pin) != 6:
@@ -203,11 +205,6 @@ class Board:
                 self.__board.digital_write(pin=parsed_pin, value=value)
         elif type_ == WRITE_MODE.SERVO:
             self.__board.servo_write(pin_number=parsed_pin, angle=value)
-        elif type_ == WRITE_MODE.STEPPER:
-            if number_of_steps is None:
-                raise TypeError("number_of_steps is required to write to a stepper")
-            else:
-                raise NotImplementedError("Stepper not implemented yet")
 
         # Tone Duration OUTPUT
         elif type_ == WRITE_MODE.TONE:
