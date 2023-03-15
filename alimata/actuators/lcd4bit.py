@@ -1,7 +1,8 @@
 # Implementation based on the implementation in the example code of the pymata 4 library
 
+from typing import Union
 from alimata.core.board import Board
-from alimata.core.core import PIN_MODE, I2C_COMMAND, print_warning
+from alimata.core.core import PIN_MODE, print_warning, WRITE_MODE
 from alimata.actuators.actuator import Actuator
 from time import sleep
 from enum import Enum
@@ -50,14 +51,10 @@ class Lcd_COMMAND(int, Enum):
     LCD_BACKLIGHT = 0b00001000
     LCD_NOBACKLIGHT = 0
 
-    EN = 0b00000100  # Enable bit
-    RW = 0b00000010  # Read/Write bit
-    RS = 0b00000001  # Register select bit
 
-
-class Lcd(Actuator):
+class Lcd4Bit(Actuator):
     """
-    A class used to represent a i2c Lcd
+    A class used to represent a manual Lcd using 4 bits
 
     Properties
     ----------
@@ -113,15 +110,16 @@ class Lcd(Actuator):
     
     """
 
-    def __init__(self, board: Board, adress, cols: int, rows: int, dot_size: int = 0):
+    def __init__(self, board: Board, pin_rs: Union[str, int], pin_en: Union[str, int], pin_4: Union[str, int],
+                 pin_5: Union[str, int], pin_6: Union[str, int], pin_7: Union[str, int], cols: int, rows: int,
+                 dot_size: int = 0):
 
-        self.__i2c_port = 0
-        super().__init__(board=board, pin=self.__i2c_port, type_=PIN_MODE.I2C)
-
-        self.__board = board
+        # self.__i2c_port = 0
+        self.__pins = [pin_rs, pin_en, pin_4, pin_5, pin_6, pin_7]
+        super().__init__(board=board, pin=self.__pins, type_=PIN_MODE.LCD4BIT)
 
         # Constant values
-        self.__address = adress
+        # self.__address = adress
         self.__rows = rows
         self.__cols = cols
         self.__dot_size = dot_size
@@ -150,7 +148,8 @@ class Lcd(Actuator):
 
         sleep(0.05)
 
-        self.__i2c_write(self.__backlight)
+        # TODO IMPLEMENT THIS
+        # self.__i2c_write(self.__backlight)
         sleep(1)
 
         # put the LCD into 4 bit mode
@@ -183,7 +182,7 @@ class Lcd(Actuator):
 
         sleep(2)  # wait for the lcd to be ready
 
-        print("LCD started | adress : " + hex(self.__address))
+        print("LCD 4 bit started")
 
     @property
     def rows_number(self):
@@ -204,11 +203,6 @@ class Lcd(Actuator):
     def current_col(self):
         '''Returns the current column'''
         return self.__current_col
-
-    @property
-    def address(self):
-        '''Returns the address of the LCD'''
-        return self.__address
 
     @property
     def backlight(self):
@@ -251,7 +245,7 @@ class Lcd(Actuator):
         for character in string:
             if not self.__writing:
                 break
-            self.__send(ord(character), Lcd_COMMAND.RS)
+            self.__send(ord(character), 1)
 
             # Increment the current column
             self.__current_col += 1
@@ -365,21 +359,23 @@ class Lcd(Actuator):
     def disable_backlight(self):
         '''Disables the backlight'''
         self.__backlight = Lcd_COMMAND.LCD_NOBACKLIGHT
-        self.__i2c_write(0)
+        # TODO IMPLEMENT THIS
+        # self.__i2c_write(0)
 
     def enable_backlight(self):
         '''Enables the backlight'''
         self.__backlight = Lcd_COMMAND.LCD_BACKLIGHT
-        self.__i2c_write(0)
+        # TODO IMPLEMENT THIS
+        # self.__i2c_write(0)
 
-    def creat_char(self, id: int, char_map: list):
+    def creat_char(self, id: int, charmap: list):
         '''Creates a custom character (id 0-7, charmap 8 bytes)'''
         if id < 0 or id > 7:
             raise ValueError('id must be between 0 and 7')
         elif self.__custom_chars[id] is not None:
             print_warning('Overwriting custom character with id {}'.format(id))
 
-        self.__custom_chars[id] = char_map
+        self.__custom_chars[id] = charmap
 
         id %= 8
 
@@ -387,8 +383,8 @@ class Lcd(Actuator):
 
         sleep(0.00005)
 
-        for i in char_map:
-            self.__send(i, Lcd_COMMAND.RS)
+        for i in charmap:
+            self.__send(i, 1)
 
         self.set_cursor(0, 0)  # Set cursor to home position
 
@@ -405,7 +401,7 @@ class Lcd(Actuator):
                 'Custom character with id {} does not exist, creat a new char with the creat_char() function'.format(
                     id))
         else:
-            self.__send(id, Lcd_COMMAND.RS)
+            self.__send(id, 1)
 
     def __text_already_set(self, text: str, col: int, row: int) -> bool:
         '''Checks if the text is already on the display'''
@@ -430,20 +426,36 @@ class Lcd(Actuator):
 
     def __send(self, value: int, mode: int, init: bool = False):
         '''Sends a value to the LCD mode (0, 1 = regerister select)'''
-        high_bits: int = value & 0b11110000
-        low_bits: int = (value << 4) & 0b11110000
 
-        self.__i2c_write(high_bits | mode | Lcd_COMMAND.EN)
+        # extract each pin value and separate it in high and low bits for 4 bit mode
+        high_pin7 = (value & 0b10000000) >> 7
+        high_pin6 = (value & 0b01000000) >> 6
+        high_pin5 = (value & 0b00100000) >> 5
+        high_pin4 = (value & 0b00010000) >> 4
+        low_pin7 = (value & 0b00001000) >> 3
+        low_pin6 = (value & 0b00000100) >> 2
+        low_pin5 = (value & 0b00000010) >> 1
+        low_pin4 = (value & 0b00000001)
+
+        self.__write_all_pins(high_pin4, high_pin5, high_pin6, high_pin7)
+        self.board.write_to_pin(self.__pins[0], WRITE_MODE.DIGITAL, mode)
+        self.board.write_to_pin(self.__pins[1], WRITE_MODE.DIGITAL, 1)
+
         sleep(0.000001)
-        self.__i2c_write(high_bits | mode)
+        self.board.write_to_pin(self.__pins[1], WRITE_MODE.DIGITAL, 0)
+
         sleep(0.00001)
         if not init:  # init only need half bits
 
             sleep(0.00004)
 
-            self.__i2c_write(low_bits | mode | Lcd_COMMAND.EN)
+            self.__write_all_pins(low_pin4, low_pin5, low_pin6, low_pin7)
+            self.board.write_to_pin(self.__pins[1], WRITE_MODE.DIGITAL, 1)
             sleep(0.000001)
-            self.__i2c_write(low_bits | mode)
+            self.board.write_to_pin(self.__pins[1], WRITE_MODE.DIGITAL, 0)
 
-    def __i2c_write(self, data: int):
-        self.__board.i2c_communication(I2C_COMMAND.WRITE, self.address, args=[data | self.__backlight])
+    def __write_all_pins(self, p4: int, p5: int, p6: int, p7: int):
+        self.board.write_to_pin(self.__pins[2], WRITE_MODE.DIGITAL, p4)
+        self.board.write_to_pin(self.__pins[3], WRITE_MODE.DIGITAL, p5)
+        self.board.write_to_pin(self.__pins[4], WRITE_MODE.DIGITAL, p6)
+        self.board.write_to_pin(self.__pins[5], WRITE_MODE.DIGITAL, p7)

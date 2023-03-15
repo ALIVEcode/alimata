@@ -17,16 +17,13 @@ class Knock(Sensor):
         the pin of the Knock Sensor
     """
 
-    def __init__(self, board: Board, pin: str, treshold: int = 0 ,on_change: Union[Callable[[List[Union[float, int]]], None], None ]= None):
-        
+    def __init__(self, board: Board, pin: str, threshold: int = 0,
+                 on_change: Union[Callable[[List[Union[float, int]]], None], None] = None):
         self.__value = 0
         self.__is_knocked = False
-        self.__treshold = treshold
+        self.__threshold = threshold
         self.__last_knocked = time.time()
         super().__init__(board=board, pin=pin, on_change=on_change, type_=PIN_MODE.ANALOG_INPUT)
-
-    
-
 
     @property
     def data(self):
@@ -36,8 +33,7 @@ class Knock(Sensor):
     # Change the status of the sensor is knock
     def _update_data(self, data: list):
         """Callback when the knock sensor value has changed"""
-        if data[2] >= self.__treshold and (time.time() - self.__last_knocked) * 1000 > 100:
+        if data[2] >= self.__threshold and (time.time() - self.__last_knocked) * 1000 > 100:
             self.__is_knocked = True
             self.__last_knocked = time.time()
             self.__value = data[2]
-

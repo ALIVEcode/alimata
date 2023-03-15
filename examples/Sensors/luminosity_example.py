@@ -1,21 +1,21 @@
-from alimata.sensors.potentiometer import Potentiometer
+from alimata.sensors.luminosity import Luminosity
 from alimata.core.board import Board
 from time import sleep
 
-# Defining the pin of the potentiometer sensor
+# Defining the pin of the luminosity sensor
 pin = "A0"
 
 # Creating a new board
 board = Board()
 
 
-# Only called when the potentiometer is moved
+# Only called when the luminosity is changed
 def callback_function(obj):
     print("value : " + str(obj.data))
 
 
-# Creating a new Potentiometer object
-potentiometer = Potentiometer(board, pin, on_change=callback_function)
+# Creating a new luminosity sensor object
+luminosity = Luminosity(board, pin, on_change=callback_function)
 
 
 # Main function
@@ -24,7 +24,7 @@ def setup():
 
 
 def loop():
-    print(potentiometer.data)
+    print(luminosity.data)
     sleep(1)
 
 

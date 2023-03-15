@@ -1,9 +1,8 @@
 from alimata.core.board import Board
-from alimata.core.core import DHT_TYPE
-from typing import Callable, Optional, Union
+from alimata.core.core import DHT_TYPE, PIN_MODE
+from typing import Callable, Optional, Union, List
 
 from abc import ABC, abstractmethod
-
 
 
 class Sensor(ABC):
@@ -25,14 +24,14 @@ class Sensor(ABC):
     """
 
     # Constructor of the class Sensor
-    def __init__(self, 
-                pin: Union[str, int, tuple], 
-                board: Board,
-                type_: str, 
-                dht_type: Optional[DHT_TYPE] = None, # Facultative
-                differential: Optional[int] = 1, # Facultative
-                on_change: Optional[Callable[[list], None]] = None # Facultative
-                ):
+    def __init__(self,
+                 pin: Union[str, int, tuple, List[Union[str, int]]],
+                 board: Board,
+                 type_: PIN_MODE,
+                 dht_type: Optional[DHT_TYPE] = None,  # Facultative
+                 differential: Optional[int] = 1,  # Facultative
+                 on_change: Optional[Callable[[list], None]] = None  # Facultative
+                 ):
 
         # Create Public Attributes
         self.board = board
@@ -52,7 +51,6 @@ class Sensor(ABC):
             callback=self.__callback,
             differential=self.__differential)
 
-    
     def on_change(self, on_change: Callable[[list], None]):
         """Set the callback when the sensor value has changed"""
         self.__on_change = on_change
@@ -64,7 +62,7 @@ class Sensor(ABC):
             if not self.is_ready() or self.__on_change is None:
                 return
 
-            #call the callback set in the init with the child as the argument
+            # call the callback set in the init with the child as the argument
             self.__on_change(self)
         except Exception as e:
             print(e)
@@ -74,14 +72,12 @@ class Sensor(ABC):
         """Callback when the sensor's value has changed enough"""
         pass
 
-
     def is_ready(self) -> bool:
         """Return True if the sensor is ready to read (True or False)"""
         if self.data is None:  # self.data is a property of the child class
             return False
         return self.board.is_started()
-        
-    
+
     @property
     @abstractmethod
     def data(self):

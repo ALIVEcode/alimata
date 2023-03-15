@@ -3,14 +3,14 @@ from alimata.core.board import Board
 from time import sleep
 
 # Defining the pins of the HC-SR04 sonar
-triger_pin = 10
+trigger_pin = 10
 echo_pin = 9
 
 # Creating a new board
 board = Board()
 
 # Creating a new sonar object
-sonar = Sonar(board, triger_pin, echo_pin)
+sonar = Sonar(board, trigger_pin, echo_pin)
 
 
 # Main function

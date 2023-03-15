@@ -26,14 +26,12 @@ class DHT(Sensor):
         
     """
 
-    def __init__(self, board: Board, pin: str, dht_type: DHT_TYPE, on_change: Union[Callable[[List[Union[float, int]]], None], None ]= None):
-
+    def __init__(self, board: Board, pin: Union[int, str], dht_type: DHT_TYPE,
+                 on_change: Union[Callable[[List[Union[float, int]]], None], None] = None):
         super().__init__(board=board, pin=pin, type_=PIN_MODE.DHT, dht_type=dht_type, on_change=on_change)
 
-
         # self.__data is a tuple of (humidity, temperature)
-        self.__data = None 
-
+        self.__data = None
 
     @property
     def data(self):
@@ -44,14 +42,11 @@ class DHT(Sensor):
     def temperature(self) -> float:
         """Return the Temperature in Celsius (float)"""
         return self.__data[1]
-    
+
     @property
-    def humidity(self): 
+    def humidity(self):
         """Return the Humidity in % (float)"""
         return self.__data[0]
-
-    
-
 
     # Back end callback function (*not user defined*)
     def _update_data(self, data):

@@ -1,5 +1,4 @@
 from alimata.actuators.led import Led
-from alimata.sensors.button import Button
 from alimata.core.board import Board
 from time import sleep
 
@@ -18,7 +17,6 @@ def setup():
     print("Starting main")
 
 
-
 def loop():
     sleep(1)
     led.on()
@@ -35,7 +33,6 @@ def loop():
     print("255")
     sleep(1)
     led.off()
-
 
 
 board.start(setup, loop)

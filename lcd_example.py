@@ -4,7 +4,7 @@ from time import sleep
 
 board = Board()
 
-char = [  
+char = [
     0b00100,
     0b01110,
     0b11111,
@@ -17,6 +17,7 @@ char = [
 
 lcd = Lcd(board=board, adress=0x27, rows=4, cols=20)
 
+
 def setup():
     lcd.print("    Hello World")
     lcd.set_cursor(0, 1)
@@ -28,10 +29,10 @@ def setup():
     lcd.print_char(0)
     lcd.set_cursor(1, 3)
     lcd.print("Waiting 5 seconds")
-    
+
     for i in range(5):
         lcd.set_cursor(0, 3)
-        lcd.print("Waiting {} seconds".format(5-i))
+        lcd.print("Waiting {} seconds".format(5 - i))
         sleep(1)
 
     print("Clearing")
@@ -41,5 +42,6 @@ def setup():
 
 def loop():
     pass
+
 
 board.start(setup, loop)

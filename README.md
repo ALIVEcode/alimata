@@ -38,33 +38,35 @@ Creating a new board
 Making the setup and loop function and starting the board
 
 ```python
-    def setup():
-        #Code here is run once
+def setup():
+    #Code here is run once
+    pass
 
-    def loop():
-        #Code here is run in a loop
+def loop():
+    #Code here is run in a loop
+    pass
 
-    #Starting the board by passing the setup and loop function
-    board.start(setup,loop)
+#Starting the board by passing the setup and loop function
+board.start(setup,loop)
 
-    #Shuting the board down
-    board.shutdown()
+#Shuting the board down
+board.shutdown()
 ```
 
 #### All options of the board
 
 ```python
-    #Create the new board (optional board_id and COM_port)
-    board = Board(board_id, COM_port)
+#Create the new board (optional board_id and COM_port)
+board = Board(board_id, COM_port)
 
-    #Starting the board setup and loop async function
-    board.start(setup,loop)
+#Starting the board setup and loop async function
+board.start(setup,loop)
 
-    #Use to set the pin mode with the type (INPUT, OUTPUT, ANALOG, PWM, SONAR)
-    board.set_pin_mode(pin, type, callback, differential, echo_pin, timeout, sensor_type, min_pulse, max_pulse)
+#Use to set the pin mode with the type (INPUT, OUTPUT, ANALOG, PWM, SONAR)
+board.set_pin_mode(pin, type, callback, differential, echo_pin, timeout, sensor_type, min_pulse, max_pulse)
 
-    #Use to write to a pin with the type (ANALOG, PWM, DIGITAL, TONE, TONE_CONTINUOUS, TONE_STOP, SERVO, STEPPER)
-    board.write_pin(pin, value, type, duration, step)
+#Use to write to a pin with the type (ANALOG, PWM, DIGITAL, TONE, TONE_CONTINUOUS, TONE_STOP, SERVO, STEPPER)
+board.write_pin(pin, value, type, duration, step)
 ```
 
 ### Sensors

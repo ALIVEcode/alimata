@@ -21,27 +21,21 @@ class Button(Sensor):
         the value of the Button (Pressed (True) or Released (False))
     """
 
-
-
-    def __init__(self, board: Board, pin: str, invert: bool = False, on_change: Union[Callable[[List[Union[float, int]]], None], None ]= None):
-        
-
+    def __init__(self, board: Board, pin: Union[int, str], invert: bool = False,
+                 on_change: Union[Callable[[List[Union[float, int]]], None], None] = None):
         # Initialises the button as not pressed
-        self.__state = False # PRIVATE
+        self.__state = False  # PRIVATE
 
         # Initialises the invert value
-        self.invert = invert # PUBLIC
+        self.invert = invert  # PUBLIC
 
         super().__init__(board=board, pin=pin, type_=PIN_MODE.PULLUP, on_change=on_change)
-
-
 
     # ABSTRACT FROM SENSOR
     @property
     def data(self) -> bool:
         """Return the current status of the button (True or False)"""
         return self.__state
-
 
     # ABSTRACT FROM SENSOR
     # Change the status of the button when pressed

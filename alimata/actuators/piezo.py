@@ -24,30 +24,23 @@ class Piezo(Actuator):
     off()
         Turn the led off
     """
+
     def __init__(self, board: Board, pin: Union[str, int]):
         super().__init__(board=board, pin=pin, type_=PIN_MODE.TONE)
 
-
-    
-    def playTone(self, frequency: int = 1000, duration: int = 0):
+    def play_tone(self, frequency: int = 1000, duration: int = 0):
         """
         Turn the led on \n
         """
 
         if duration != 0:
             self.board.write_to_pin(pin=self.pin, type_=WRITE_MODE.TONE, value=frequency, duration=duration)
-            
-            
         else:
             self.board.write_to_pin(pin=self.pin, type_=WRITE_MODE.TONE_CONTINUOUS, value=frequency)
 
-        
-    
-    def stopTone(self):
+    def stop_tone(self):
         """
         Turn the led off \n
         """
         # self.__data = False # Set the status of the led to off
-        self.board.write_to_pin(pin=self.pin, type_=WRITE_MODE.TONE_STOP, value=None)
-
-  
+        self.board.write_to_pin(pin=self.pin, type_=WRITE_MODE.TONE_STOP, value=0)
