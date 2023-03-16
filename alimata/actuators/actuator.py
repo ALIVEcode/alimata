@@ -25,6 +25,7 @@ class Actuator(ABC):
         self.__min_pulse = min_pulse
         self.__max_pulse = max_pulse
         self.__stepper_type = stepper_type
+        self.__id = -1
 
         # Set the pin and other properties of the actuator and save the returned id if present
         self.__id = self.board.set_pin_mode(

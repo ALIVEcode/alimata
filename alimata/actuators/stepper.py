@@ -38,12 +38,12 @@ class Stepper(Actuator):
 
         self.new_home()
 
-        print("Stepper initialized | ID : " + str(self.__id))
+        print("Stepper initialized | ID : " + str(self.id))
 
     @property
     def motor_id(self) -> int:
         '''Returns the motor id'''
-        return self.__id
+        return self.id
 
     @property
     def current_position(self, callback=None) -> int:

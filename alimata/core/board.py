@@ -158,7 +158,8 @@ class Board:
             if type(parsed_pin) is not list:
                 raise TypeError("pin must be a list of 2 or 4 pins")
             else:
-                self.__board.set_pin_mode_stepper(interface=stepper_type, pin1=parsed_pin[0], pin2=parsed_pin[1],
+                # The stepper init will retrun the stepper id
+                return self.__board.set_pin_mode_stepper(interface=stepper_type, pin1=parsed_pin[0], pin2=parsed_pin[1],
                                                   pin3=parsed_pin[2], pin4=parsed_pin[3], enable=True)
         elif type_ == PIN_MODE.LCD4BIT:
             # TODO MAKE BETTER PIN CHECK
