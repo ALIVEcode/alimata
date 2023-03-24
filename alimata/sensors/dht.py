@@ -41,11 +41,15 @@ class DHT(Sensor):
     @property
     def temperature(self) -> float:
         """Return the Temperature in Celsius (float)"""
+        if self.__data is None:
+            return -999
         return self.__data[1]
 
     @property
     def humidity(self):
         """Return the Humidity in % (float)"""
+        if self.__data is None:
+            return -999
         return self.__data[0]
 
     # Back end callback function (*not user defined*)

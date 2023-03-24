@@ -48,11 +48,13 @@ class Board:
 
     def __main(self):
         # start the setup function
-        self.__setup_func()
+        if self.__setup_func is not None:
+            self.__setup_func()
 
         # loop the loop function
         while self.__is_started:
-            self.__loop_func()
+            if self.__loop_func is not None:
+                self.__loop_func()
 
     def start(self, setup_func=None, loop_func=None):
         """Start the board with the setup and loop fonctions or no functions"""
@@ -158,9 +160,10 @@ class Board:
         elif type_ == PIN_MODE.STEPPER:
             if type(parsed_pin) is not list:
                 raise TypeError("pin must be a list of 2 or 4 pins")
-            else:
-                # The stepper init will retrun the stepper id
-                return self.__board.set_pin_mode_stepper(interface=stepper_type, pin1=parsed_pin[0], pin2=parsed_pin[1],
+            elif stepper_type is None:
+                raise AlimataExpectedValue("stepper_type is required to setup a stepper")
+            # The stepper init will retrun the stepper id
+            return self.__board.set_pin_mode_stepper(interface=stepper_type, pin1=parsed_pin[0], pin2=parsed_pin[1],
                                                   pin3=parsed_pin[2], pin4=parsed_pin[3], enable=True)
         elif type_ == PIN_MODE.LCD4BIT:
             # TODO MAKE BETTER PIN CHECK
@@ -183,6 +186,8 @@ class Board:
             self.__board.set_pin_mode_spi(chip_select_list=parsed_pin)
         else:
             raise AlimataUnexpectedPinMode("pin mode must be from the PIN_MODE enum")
+
+        return -1 # Return -1 if no stepper
 
     # Use PWM for analog write
     def write_to_pin(self, pin: Union[str, int], type_: WRITE_MODE, value: int, duration: Optional[int] = None):

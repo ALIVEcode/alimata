@@ -5,6 +5,7 @@ from alimata.core.core import PIN_MODE, I2C_COMMAND, print_warning
 from alimata.actuators.actuator import Actuator
 from time import sleep
 from enum import Enum
+from typing import Union
 
 
 class Lcd_COMMAND(int, Enum):
@@ -234,8 +235,8 @@ class Lcd(Actuator):
     def get_current_text(self):
         '''Returns the current text on the LCD (as a list)'''
         return self.__current_text
-
-    def print(self, string: str, col: int = None, row: int = None):
+    
+    def print(self, string: str, col: Union[int, None] = None, row: Union[int, None] = None):
         '''Prints a string on the LCD at the current position (or at the specified position)'''
         if col is not None and row is not None:
             self.set_cursor(col, row)
@@ -349,8 +350,8 @@ class Lcd(Actuator):
 
     def right_to_left(self):
         '''Sets the text direction to right to left'''
-        self.__display_mode = self.__display_mode & ~ Lcd_COMMAND.LCD_ENTRYLEFT
-        self.__command(Lcd_COMMAND.LCD_ENTRYMODESET | Lcd_COMMAND.__display_mode)
+        self.__display_mode = self.__display_mode &~ Lcd_COMMAND.LCD_ENTRYLEFT
+        self.__command(Lcd_COMMAND.LCD_ENTRYMODESET | self.__display_mode)
 
     def enable_auto_scroll(self):
         '''Enables automatic scrolling'''
@@ -376,7 +377,7 @@ class Lcd(Actuator):
         '''Creates a custom character (id 0-7, charmap 8 bytes)'''
         if id < 0 or id > 7:
             raise ValueError('id must be between 0 and 7')
-        elif self.__custom_chars[id] is not None:
+        elif self.__custom_chars[id] != [0]:
             print_warning('Overwriting custom character with id {}'.format(id))
 
         self.__custom_chars[id] = char_map
@@ -409,7 +410,7 @@ class Lcd(Actuator):
 
     def __text_already_set(self, text: str, col: int, row: int) -> bool:
         '''Checks if the text is already on the display'''
-
+    
         current_text = self.__current_text[row]
 
         if col != 0:

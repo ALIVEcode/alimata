@@ -27,9 +27,9 @@ class Stepper(Actuator):
         self.__speed = 200
         self.speed = self.__speed
 
-        self.__enable = None
+        self.__enable = True
 
-        self.__min_pulse_width = None
+        self.__min_pulse_width = -1
 
         self.__acceleration = 800
         self.acceleration = self.__acceleration
