@@ -3,8 +3,9 @@ import sys
 from typing import Optional, Union
 
 from firmetix import firmetix
+from firmetix.private_constants import Connection_type
 
-from alimata.core.core import DHT_TYPE, PIN_MODE, WRITE_MODE, I2C_COMMAND, SPI_COMMAND, STEPPER_TYPE, print_warning
+from alimata.core.core import DHT_TYPE, PIN_MODE, WRITE_MODE, I2C_COMMAND, SPI_COMMAND, STEPPER_TYPE, CONNECTION_TYPE, print_warning
 from alimata.core.error import AlimataUnexpectedPin, AlimataUnexpectedPinMode, AlimataUnexpectedWriteMode, \
     AlimataUnexpectedValue, AlimataUnexpectedI2cCommand, AlimataExpectedValue, AlimataCallbackNotDefined
 
@@ -15,8 +16,18 @@ class Board:
 
     Attributes
     ----------
-    board_id : int
+    board_id (optional) : int
         The id of the board same as in firmetix4arduino (read only)
+    COM_port (optional)  : str
+        The COM port of the board if it is connected with a serial connection (read only)
+    connection_type (optional) : CONNECTION_TYPE
+        The connection type of the board (read only) (CONNECTION_TYPE.SERIAL, CONNECTION_TYPE.WIFI, CONNECTION_TYPE.BLUETOOTH)
+    ip_address (optional) : str
+        The ip address of the board if it is connected with a wifi connection (read only)
+    ble_mac_address (optional) : str
+        The mac address of the board if it is connected with a bluetooth connection (read only)
+    ble_name (optional) : str
+        The name of the board if it is connected with a bluetooth connection (read only)
 
     
     Methods
@@ -38,8 +49,8 @@ class Board:
     
     """
 
-    def __init__(self, board_id: int = 1, COM_port=None):
-        self.__board = firmetix.Firmetix(arduino_instance_id=board_id, com_port=COM_port, arduino_wait=2)
+    def __init__(self, board_id: int = 1, COM_port=None, connection_type: CONNECTION_TYPE=CONNECTION_TYPE.SERIAL,  ip_address=None, ble_mac_address=None, ble_name=None):
+        self.__board = firmetix.Firmetix(arduino_instance_id=board_id, com_port=COM_port, arduino_wait=2, connection_type=connection_type, ip_address=ip_address, ble_mac_address=ble_mac_address, ble_name=ble_name)
         self.__board_id = board_id
         self.__is_started = False
 
