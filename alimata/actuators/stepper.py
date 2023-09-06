@@ -28,21 +28,21 @@ class Stepper(Actuator):
         self.__speed = 200
         self.speed = self.__speed
 
-        self.__enable = None
+        self.__enable = True
 
-        self.__min_pulse_width = None
+        self.__min_pulse_width = -1
 
         self.__acceleration = 800
         self.acceleration = self.__acceleration
 
-        self.__callback_value = None
+        self.__callback_value = [0]
 
-        print("Stepper initialized | ID : " + str(self.__id))
+        print("Stepper initialized | ID : " + str(self.id))
 
     @property
     def motor_id(self) -> int:
         '''Returns the motor id'''
-        return self.__id
+        return self.id
 
     @property
     def current_position(self, callback=None) -> int:
@@ -135,8 +135,8 @@ class Stepper(Actuator):
         '''Moves the stepper motor to the home position \n retrun True when done'''
         return self.move_to(0, callback=callback)
 
-    def move(self, relative_position: int, callback=None, wait: bool = True) -> bool:
-        '''Moves the stepper motor to the relative position \n retrun True when done or if we're not waiting'''
+    def move(self, relative_position: int, callback=None, blocking: bool = True) -> bool:
+        '''Moves the stepper motor to the relative position \n retrun True when done or if we're not blocking'''
         if not self.__is_enabled():
             print_warning("The stepper motor is not enabled skipping instruction")
             return False
@@ -144,12 +144,12 @@ class Stepper(Actuator):
         self.board.firmetix_board.stepper_run_speed_to_position(self.motor_id,
                                                                 lambda data: self.__callback(data,
                                                                                              user_callback=callback))
-        if wait:
+        if blocking:
             return self.__wait_for_callback(19)
         return True
 
-    def move_to(self, absolute_position: int, callback=None, wait: bool = True) -> bool:
-        '''Moves the stepper motor to an absolute position \n retrun True when done or if we're not waiting'''
+    def move_to(self, absolute_position: int, callback=None, blocking: bool = True) -> bool:
+        '''Moves the stepper motor to an absolute position \n retrun True when done or if we're not blocking'''
         if not self.__is_enabled():
             print_warning("The stepper motor is not enabled skipping instruction")
             return False
@@ -157,13 +157,13 @@ class Stepper(Actuator):
         self.board.firmetix_board.stepper_run_speed_to_position(self.motor_id,
                                                                 lambda data: self.__callback(data,
                                                                                              user_callback=callback))
-        if wait:
+        if blocking:
             return self.__wait_for_callback(19)
         return True
 
     def run(self):
         '''Run the stepper motor at the current speed until stopped'''
-        self.board.firmetix_board.stepper_run(self.motor_id, lambda data: self.__callback(data, user_callback=callback))
+        self.board.firmetix_board.stepper_run(self.motor_id, lambda data: self.__callback(data, user_callback=None))
 
     def stop(self):
         '''Stops the stepper motor'''

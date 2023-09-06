@@ -29,6 +29,6 @@ if __name__ == "__main__":
               include=['alimata', 'alimata.*']),
           include_package_data=True,
           python_requires=">=3.7",
-          install_requires=["firmetix>=6.0.1"],
+          install_requires=["firmetix>=7.0.1"],
           setup_requires="setuptools",
           )

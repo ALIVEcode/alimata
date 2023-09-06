@@ -3,10 +3,12 @@ import sys
 from typing import Optional, Union
 
 from firmetix import firmetix
+from firmetix.private_constants import Connection_type
 
-from alimata.core.core import DHT_TYPE, PIN_MODE, WRITE_MODE, I2C_COMMAND, SPI_COMMAND, STEPPER_TYPE, print_warning
+from alimata.core.core import DHT_TYPE, PIN_MODE, WRITE_MODE, I2C_COMMAND, SPI_COMMAND, STEPPER_TYPE, CONNECTION_TYPE, print_warning
 from alimata.core.error import AlimataUnexpectedPin, AlimataUnexpectedPinMode, AlimataUnexpectedWriteMode, \
-    AlimataUnexpectedValue, AlimataUnexpectedI2cCommand, AlimataExpectedValue, AlimataCallbackNotDefined
+    AlimataUnexpectedValue, AlimataUnexpectedI2cCommand, AlimataExpectedValue, AlimataCallbackNotDefined, \
+    AlimataExpectedParameters
 
 
 class Board:
@@ -15,8 +17,18 @@ class Board:
 
     Attributes
     ----------
-    board_id : int
+    board_id (optional) : int
         The id of the board same as in firmetix4arduino (read only)
+    COM_port (optional)  : str
+        The COM port of the board if it is connected with a serial connection (read only)
+    connection_type (optional) : CONNECTION_TYPE
+        The connection type of the board (read only) (CONNECTION_TYPE.SERIAL, CONNECTION_TYPE.WIFI, CONNECTION_TYPE.BLUETOOTH)
+    ip_address (optional) : str
+        The ip address of the board if it is connected with a wifi connection (read only)
+    ble_mac_address (optional) : str
+        The mac address of the board if it is connected with a bluetooth connection (read only)
+    ble_name (optional) : str
+        The name of the board if it is connected with a bluetooth connection (read only)
 
     
     Methods
@@ -38,8 +50,8 @@ class Board:
     
     """
 
-    def __init__(self, board_id: int = 1, COM_port=None):
-        self.__board = firmetix.Firmetix(arduino_instance_id=board_id, com_port=COM_port, arduino_wait=2)
+    def __init__(self, board_id: int = 1, COM_port=None, connection_type: CONNECTION_TYPE=CONNECTION_TYPE.SERIAL,  ip_address=None, ble_mac_address=None, ble_name=None):
+        self.__board = firmetix.Firmetix(arduino_instance_id=board_id, com_port=COM_port, arduino_wait=2, connection_type=connection_type, ip_address=ip_address, ble_mac_address=ble_mac_address, ble_name=ble_name)
         self.__board_id = board_id
         self.__is_started = False
 
@@ -48,13 +60,16 @@ class Board:
 
     def __main(self):
         # start the setup function
-        self.__setup_func()
+        if self.__setup_func is not None:
+            self.__setup_func()
 
         # loop the loop function
         while self.__is_started:
-            self.__loop_func()
+            if self.__loop_func is not None:
+                self.__loop_func()
 
     def start(self, setup_func=None, loop_func=None):
+        """Start the board with the setup and loop fonctions or no functions"""
         if self.__is_started:
             print_warning("Board is already started, not starting again")
             return
@@ -75,8 +90,8 @@ class Board:
             except (KeyboardInterrupt, RuntimeError):
                 self.shutdown()
                 sys.exit(0)
-        elif setup_func is None or loop_func is None:
-            raise TypeError("Both setup_func and loop_func must be defined or none of them")
+        elif setup_func is None and setup_func is not None or loop_func is None and setup_func is not None:
+            raise AlimataExpectedParameters("Both setup_func and loop_func must be defined or none of them")
         else:
             self.__is_started = True
             print("Board started")
@@ -157,8 +172,10 @@ class Board:
         elif type_ == PIN_MODE.STEPPER:
             if type(parsed_pin) is not list:
                 raise TypeError("pin must be a list of 2 or 4 pins")
-            else:
-                self.__board.set_pin_mode_stepper(interface=stepper_type, pin1=parsed_pin[0], pin2=parsed_pin[1],
+            elif stepper_type is None:
+                raise AlimataExpectedValue("stepper_type is required to setup a stepper")
+            # The stepper init will retrun the stepper id
+            return self.__board.set_pin_mode_stepper(interface=stepper_type, pin1=parsed_pin[0], pin2=parsed_pin[1],
                                                   pin3=parsed_pin[2], pin4=parsed_pin[3], enable=True)
         elif type_ == PIN_MODE.LCD4BIT:
             # TODO MAKE BETTER PIN CHECK
@@ -181,6 +198,8 @@ class Board:
             self.__board.set_pin_mode_spi(chip_select_list=parsed_pin)
         else:
             raise AlimataUnexpectedPinMode("pin mode must be from the PIN_MODE enum")
+
+        return -1 # Return -1 if no stepper
 
     # Use PWM for analog write
     def write_to_pin(self, pin: Union[str, int], type_: WRITE_MODE, value: int, duration: Optional[int] = None):

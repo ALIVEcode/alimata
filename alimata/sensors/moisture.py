@@ -31,11 +31,11 @@ class Moisture(Sensor):
                  on_change: Union[Callable[[List[Union[float, int]]], None], None] = None):
         super().__init__(board=board, pin=pin, type_=PIN_MODE.ANALOG_INPUT, on_change=on_change)
 
-        self.__data = None
+        self.__data: int = -1
 
     def mapped_data(self, min_val: int, max_val: int) -> int:
         """Return the current value of moisture mapped to the given range (min to max)"""
-        return map_range(self.__data, 0, 255, min_val, max_val)
+        return int(map_range(self.__data, 0, 255, min_val, max_val))
 
     def level(self) -> float:
         """Return the current level of moisture (0 to 100)"""

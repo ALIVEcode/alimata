@@ -14,13 +14,13 @@ class Actuator(ABC):
                  type_: PIN_MODE,
                  min_pulse: int = 544,
                  max_pulse: int = 2400,
-                 stepper_type: STEPPER_TYPE = None):
+                 stepper_type: Union[STEPPER_TYPE, None] = None):
         ''' Returns None exept for the stepper'''
-        # Create Public Attributes
-        self.board = board
-        self.pin = pin
+
 
         # Create Private Attributes
+        self.__board = board
+        self.__pin = pin
         self.__type = type_
         self.__min_pulse = min_pulse
         self.__max_pulse = max_pulse
@@ -38,3 +38,13 @@ class Actuator(ABC):
     def id(self) -> int:
         '''Returns the id of the actuator'''
         return self.__id
+    
+    @property
+    def board(self) -> Board:
+        '''Returns the board of the actuator'''
+        return self.__board
+    
+    @property
+    def pin(self) -> Union[str, int, list]:
+        '''Returns the pin of the actuator'''
+        return self.__pin

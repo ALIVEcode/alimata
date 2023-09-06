@@ -24,14 +24,14 @@ class Sonar(Sensor):
         
     """
 
-    def __init__(self, board: Board.firmetix_board, trigger_pin: Union[str, int], echo_pin: Union[str, int],
+    def __init__(self, board: Board, trigger_pin: Union[str, int], echo_pin: Union[str, int],
                  on_change: Union[Callable[[List[Union[float, int]]], None], None] = None):
 
         pin_ = [trigger_pin, echo_pin]
 
         super().__init__(board=board, pin=pin_, on_change=on_change, type_=PIN_MODE.SONAR)
 
-        self.__data = None
+        self.__data = -1
 
     @property
     def data(self):
