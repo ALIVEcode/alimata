@@ -14,7 +14,7 @@ README = (HERE / "README.md").read_text()
 
 if __name__ == "__main__":
     setup(name='alimata',
-          author='Nils Lahaye and Francis M-G',
+          author='Nils Lahaye and Francis M-G researchers at LRIMa',
           author_email="alivecode.developers@gmail.com",
           version=alimata.__version__,
           description='Alimata is a Python library to simplify the use of the pymata-express library.',

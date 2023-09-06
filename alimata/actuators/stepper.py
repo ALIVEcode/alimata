@@ -20,9 +20,10 @@ class Stepper(Actuator):
 
         super().__init__(pin=pin_, board=board, type_=PIN_MODE.STEPPER, stepper_type=stepper_type)
 
-        self.__set_max_speed(max_speed=max_speed)
+        self.current_position = 0
 
         self.__max_speed = max_speed
+        self.__set_max_speed(max_speed=max_speed)
 
         self.__speed = 200
         self.speed = self.__speed
@@ -36,9 +37,7 @@ class Stepper(Actuator):
 
         self.__callback_value = None
 
-        self.new_home()
-
-        print("Stepper initialized | ID : " + str(self.id))
+        print("Stepper initialized | ID : " + str(self.__id))
 
     @property
     def motor_id(self) -> int:
@@ -52,6 +51,11 @@ class Stepper(Actuator):
                                                                lambda data: self.__callback(data,
                                                                                             user_callback=callback))
         return self.__wait_for_callback(17)[2]
+    
+    @current_position.setter
+    def current_position(self, position:int):
+        '''Resets the current position of the motor'''
+        self.board.firmetix_board.stepper_set_current_position(self.motor_id, position)
 
     @property
     def target_position(self, callback=None) -> int:
@@ -87,6 +91,11 @@ class Stepper(Actuator):
     def acceleration(self) -> int:
         '''Set or get the acceleration in steps per second'''
         return self.__acceleration
+    
+    @acceleration.setter
+    def acceleration(self, acceleration: int):
+        self.board.firmetix_board.stepper_set_acceleration(self.motor_id, acceleration)
+        self.__acceleration = acceleration
 
     @property
     def enable(self) -> bool:
@@ -110,11 +119,6 @@ class Stepper(Actuator):
     def min_pulse_width(self, min_pulse_width: int):
         self.board.firmetix_board.stepper_set_min_pulse_width(self.motor_id, min_pulse_width)
         self.__min_pulse_width = min_pulse_width
-
-    @acceleration.setter
-    def acceleration(self, acceleration: int):
-        self.board.firmetix_board.stepper_set_acceleration(self.motor_id, acceleration)
-        self.__acceleration = acceleration
 
     def running(self, callback=None) -> bool:
         '''Returns True if the stepper motor is running'''
@@ -159,7 +163,7 @@ class Stepper(Actuator):
 
     def run(self):
         '''Run the stepper motor at the current speed until stopped'''
-        self.board.firmetix_board.stepper_run(self.motor_id)
+        self.board.firmetix_board.stepper_run(self.motor_id, lambda data: self.__callback(data, user_callback=callback))
 
     def stop(self):
         '''Stops the stepper motor'''
