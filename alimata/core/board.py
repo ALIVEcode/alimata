@@ -7,7 +7,8 @@ from firmetix.private_constants import Connection_type
 
 from alimata.core.core import DHT_TYPE, PIN_MODE, WRITE_MODE, I2C_COMMAND, SPI_COMMAND, STEPPER_TYPE, CONNECTION_TYPE, print_warning
 from alimata.core.error import AlimataUnexpectedPin, AlimataUnexpectedPinMode, AlimataUnexpectedWriteMode, \
-    AlimataUnexpectedValue, AlimataUnexpectedI2cCommand, AlimataExpectedValue, AlimataCallbackNotDefined
+    AlimataUnexpectedValue, AlimataUnexpectedI2cCommand, AlimataExpectedValue, AlimataCallbackNotDefined, \
+    AlimataExpectedParameters
 
 
 class Board:
@@ -90,7 +91,7 @@ class Board:
                 self.shutdown()
                 sys.exit(0)
         elif setup_func is None and setup_func is not None or loop_func is None and setup_func is not None:
-            raise TypeError("Both setup_func and loop_func must be defined or none of them")
+            raise AlimataExpectedParameters("Both setup_func and loop_func must be defined or none of them")
         else:
             self.__is_started = True
             print("Board started")

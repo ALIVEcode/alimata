@@ -32,6 +32,10 @@ class AlimataUnexpectedI2cCommand(Exception):
     def __init__(self, msg: str):
         super().__init__("Unexpected I2C command ", msg)
 
+class AlimataExpectedParameters(Exception):
+    def __init__(self, msg: str):
+        super().__init__("Expected parameters ", msg)
+
 
 class AlimataCallbackNotDefined(Exception):
     def __init__(self, msg: str):
