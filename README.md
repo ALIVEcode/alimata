@@ -1,5 +1,5 @@
 # Alimata
-
+[![PyPI version](https://img.shields.io/pypi/v/alimata.svg?logo=pypi&logoColor=FFE873)](https://pypi.org/project/alimata/)
 ## What is it?
 
 Alimata is a python library used to simplify the implementation of [firmetix](https://github.com/Nilon123456789/firmetix) library
