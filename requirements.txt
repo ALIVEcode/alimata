@@ -1,1 +1,1 @@
-firmetix >= 6.0.1
+firmetix >= 7.1.1
