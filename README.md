@@ -18,13 +18,13 @@ To install Fimetix on Linux (including Raspberry Pi) and macOS computers, open a
 
 For Windows users type: `pip install firmetix`
 
-### Firmetix4Arduino
+### Firmetix arduino librarie
 
 1. Open the Arduino IDE and select Tools/Manage Libraries
-2. Search for "firmetix4arduino"
+2. Search for "Firmetix"
 3. Install
-4. Firmetix4Arduino also requires other library just install all of them.
-5. Open the Firmetix4Arduino example
+4. Firmetix also requires other library just install all of them.
+5. Open the Firmetix/Firmetix4Arduino example
 6. If you plan to use multiple arduino use `#define ARDUINO_INSTANCE_ID 1`
 7. Flash it to the arduino
 
