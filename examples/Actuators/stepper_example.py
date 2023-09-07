@@ -10,7 +10,7 @@ board = Board()
 
 
 # Create a servo object
-stepper = Stepper(board=board, stepper_type=STEPPER_TYPE.FULL4WIRE, pin1=8, pin2=9, pin3=10, pin4=11)
+stepper = Stepper(board=board, stepper_type=STEPPER_TYPE.FULL4WIRE, pin1=8, pin2=10, pin3=9, pin4=11)
 
 def callback(data):
     print(data)
