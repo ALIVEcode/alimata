@@ -32,7 +32,7 @@ class Stepper(Actuator):
 
         self.__min_pulse_width = -1
 
-        self.__acceleration = 800
+        self.__acceleration = 50
         self.acceleration = self.__acceleration
 
         self.__callback_value = [0]
@@ -141,7 +141,7 @@ class Stepper(Actuator):
             print_warning("The stepper motor is not enabled skipping instruction")
             return False
         self.board.firmetix_board.stepper_move(self.motor_id, relative_position)
-        self.board.firmetix_board.stepper_run_speed_to_position(self.motor_id,
+        self.board.firmetix_board.stepper_run(self.motor_id,
                                                                 lambda data: self.__callback(data,
                                                                                              user_callback=callback))
         if blocking:
@@ -154,7 +154,7 @@ class Stepper(Actuator):
             print_warning("The stepper motor is not enabled skipping instruction")
             return False
         self.board.firmetix_board.stepper_move_to(self.motor_id, absolute_position)
-        self.board.firmetix_board.stepper_run_speed_to_position(self.motor_id,
+        self.board.firmetix_board.stepper_run(self.motor_id,
                                                                 lambda data: self.__callback(data,
                                                                                              user_callback=callback))
         if blocking:
